@@ -1,4 +1,5 @@
 import pandas as pd
+import re
 
 data_path = '../data/'
 
@@ -94,6 +95,32 @@ def location_list(matrix):
         i = i+1
 
     return loc
+
+def clean_city(string):
+    string1 = re.sub(' \(([^)]+)\)', '', string)
+    string2 = re.sub('\(([^)]+)\)', '', string1)
+    string3 = re.sub(' \<([^)]+)\>', '', string2)
+    string4 = re.sub('\<([^)]+)\>', '', string3)
+    string5 = re.sub(' \[([^)]+)\]', '', string4)
+    string6 = re.sub('\[([^)]+)\]', '', string5)
+    string7 = re.sub('\(([^)]+)', '', string6)
+    string8 = re.sub('\(', '', string7)
+    string9 = re.sub('\)', '', string8)
+    string10 = re.sub('\?', '', string9)
+
+    return string10
+
+
+def are_clean_cities_in_bios(dic, key):
+    dummies = []
+    for l in dic[key]['orte'].values():
+        if re.search(clean_city(l), dic[key]['leben']):
+            dummies.append(1)
+        else:
+            print(l)
+            dummies.append(0)
+
+    return dummies
 
 # print(len(location_list(orte_bio_output(data_path))))
 
