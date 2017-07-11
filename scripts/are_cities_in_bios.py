@@ -12,18 +12,18 @@ def build_people_dic(dir_prefix):
     return dic2
 
 
-def are_cities_in_bios(dic, key):
-    dummies = []
-    for l in dic[key]['orte'].values():
-        try:
-            if re.search(l, dic[key]['leben']):
-                dummies.append(1)
-            else:
-                dummies.append(0)
-        except:
-            print(l, dic[key]['leben'])
+#def are_cities_in_bios(dic, key):
+    #    dummies = []
+    #    for l in dic[key]['orte'].values():
+    #        try:
+    #            if re.search(l, dic[key]['leben']):
+    #                dummies.append(1)
+    #            else:
+    #                dummies.append(0)
+    #        except:
+    #            print(l, dic[key]['leben'])
 
-    return dummies
+#    return dummies
 
 
 def clean_city(string):
@@ -33,20 +33,25 @@ def clean_city(string):
     string4 = re.sub('\<([^)]+)\>', '', string3)
     string5 = re.sub(' \[([^)]+)\]', '', string4)
     string6 = re.sub('\[([^)]+)\]', '', string5)
+    string7 = re.sub('\(([^)]+)', '', string6)
+    string8 = re.sub('\(', '', string7)
+    string9 = re.sub('\)', '', string8)
+    string10 = re.sub('\?', '', string9)
 
-    return string6
+    return string10
 
 
 def are_clean_cities_in_bios(dic, key):
     dummies = []
     for l in dic[key]['orte'].values():
         try:
-            if re.search(l, clean_city(dic[key]['leben'])):
+            if re.search(clean_city(l), dic[key]['leben']):
                 dummies.append(1)
             else:
+                print(l)
                 dummies.append(0)
         except:
-            print(l, clean_city(dic[key]['leben']))
+            print(clean_city(l))
 
     return dummies
 
@@ -57,3 +62,5 @@ for k in testdic.keys():
     test = test + are_clean_cities_in_bios(testdic, k)
 
 print(sum(test)/len(test))
+
+#print(clean_city('Wien (?)'))
