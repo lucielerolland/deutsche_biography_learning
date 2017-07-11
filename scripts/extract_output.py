@@ -97,19 +97,18 @@ def location_list(matrix):
 
 # print(len(location_list(orte_bio_output(data_path))))
 
-d=location_list(orte_output(data_path))
-d_list = []
+#d=location_list(orte_output(data_path))
+#d_list = []
 
-for key, value in d.items():
-    temp = [key, value]
-    d_list.append(temp)
+#for key, value in d.items():
+    #    temp = [key, value]
+#    d_list.append(temp)
 
-d_list.sort(key=lambda x: -x[1])
+#d_list.sort(key=lambda x: -x[1])
 
-for k in range(0, 99):
-    print(d_list[k])
+#for k in range(0, 99):
+#   print(d_list[k])
 
-# print(len(location_list(orte_no_bio_output(data_path))))
 
 # print(len(locationList(orte_output(data_path))))
 
