@@ -1,7 +1,5 @@
 import pandas as pd
 
-data_path = '../data/'
-
 
 def full_input(dir_prefix):
 

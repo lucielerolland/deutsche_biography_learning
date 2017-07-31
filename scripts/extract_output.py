@@ -1,8 +1,6 @@
 import pandas as pd
 import re
 
-data_path = '../data/'
-
 
 def full_output(dir_prefix):
 

@@ -1,7 +1,8 @@
-#import extract_input as ei
-#import extract_output as eo
+# import extract_input as ei
+# import extract_output as eo
 import re
 from sklearn.feature_extraction.text import CountVectorizer
+import numpy as np
 
 data_path = '../data/'
 
@@ -21,7 +22,7 @@ def city_match_sentence(biography, clean_city):
             sentence.append(k)
             long_clean_city.append(clean_city)
 
-    return [long_clean_city, sentence]
+    return long_clean_city, sentence
 
 
 def is_city_in_orte(clean_city, orte):
@@ -32,7 +33,7 @@ def is_city_in_orte(clean_city, orte):
 
     return city_in_orte_dummy
 
-word_vect = CountVectorizer(analyzer = "word", tokenizer = None, preprocessor = None, stop_words = None, max_features = 5000)
+word_vect = CountVectorizer(analyzer="word", tokenizer=None, preprocessor=None, stop_words=None, max_features=5000)
 
 
 def train_sentence_to_matrix(train_sentences):
@@ -53,9 +54,3 @@ def centered_reduced(matrix):
     cr = (matrix-mmean)/mstd
 
     return cr
-
-#biography = "Brentel: Jörg Brentel, aus Ellbogen, lebte in der ersten Hälfte des 16. Jahrhunderts. Wir besitzen von ihm erzählende und Spruchgedichte, unter jenen eines in Frauenlob's spätem Ton, das die Geschichte von der halben Decke, Undank der Kinder gegen die Eltern, zum Gegenstand hat, unter diesen einen Trostspruch wider den Türken, und einen Spruch von Tobias Lehre an seinen Sohn (1545), beide jedoch nur mit J. B. bezeichnet."
-
-#clean_city = "Ellbogen"
-
-print(city_match_sentence(biography=biography, clean_city=clean_city))

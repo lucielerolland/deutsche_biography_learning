@@ -17,13 +17,15 @@ def gradient(x, beta, y, l, has_constant=True):
     m = np.shape(x)[0]
     if has_constant:
         k = np.shape(x)[1]
-        mult = np.identity(k, k)
+        mult = np.identity(k, dtype=float)
         mult[0] = 0
         reg_gradient = (l/m)*mult.dot(beta)
     else:
         reg_gradient = (l/m)*beta
     direct_gradient = (1/m)*np.transpose(x).dot(sigmoid(x.dot(beta))-y)
-    grad = direct_gradient + reg_gradient
+    grad = direct_gradient + np.mat(reg_gradient)
+
+    print(np.shape(grad))
 
     return grad
 
