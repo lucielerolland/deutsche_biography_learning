@@ -80,7 +80,7 @@ train_x = x[train_sample]
 
 # Gradient descent
 
-iterations = 15000
+iterations = 150000
 alpha = 0.1
 l = 0.1
 
@@ -100,7 +100,7 @@ test_pred_y = lr.pred(test_x, beta)
 exact_pred = 0
 total = 0
 
-for i in range(test_pred_y):
+for i in range(np.shape(test_pred_y)[0]):
     total += 1
     if test_pred_y[i] == y[i]:
         exact_pred =+ 1
