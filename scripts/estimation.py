@@ -80,19 +80,29 @@ train_x = x[train_sample]
 
 # Gradient descent
 
-iterations = 1500
+iterations = 15000
 alpha = 0.1
 l = 0.1
 
 beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))
 
 cost = []
+index = []
 
 for i in range(iterations):
-    beta1 = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
+    beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
     cost.append(lr.cost(train_x, beta, train_y, l))
-
-print(cost)
 
 # Compute perf on test
 
+test_pred_y = lr.pred(test_x, beta)
+
+exact_pred = 0
+total = 0
+
+for i in range(test_pred_y):
+    total += 1
+    if test_pred_y[i] == y[i]:
+        exact_pred =+ 1
+
+print(exact_pred/total)
