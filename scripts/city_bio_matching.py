@@ -1,10 +1,6 @@
-# import extract_input as ei
-# import extract_output as eo
 import re
 from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
-
-data_path = '../data/'
 
 
 def cut_into_sentences(paragraph):

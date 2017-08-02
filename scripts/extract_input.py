@@ -3,7 +3,7 @@ import pandas as pd
 
 def full_input(dir_prefix):
 
-    input_csv =pd.read_csv(dir_prefix + 'input/input'+str(0)+'.csv')
+    input_csv = pd.read_csv(dir_prefix + 'input/input'+str(0)+'.csv')
 
     i = 1
     while i < 148:

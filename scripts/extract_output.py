@@ -99,8 +99,8 @@ def location_list(matrix):
 def clean_city(string):
     string1 = re.sub(' \(([^)]+)\)', '', string)
     string2 = re.sub('\(([^)]+)\)', '', string1)
-    string3 = re.sub(' \<([^)]+)\>', '', string2)
-    string4 = re.sub('\<([^)]+)\>', '', string3)
+    string3 = re.sub(' <([^)]+)>', '', string2)
+    string4 = re.sub('<([^)]+)>', '', string3)
     string5 = re.sub(' \[([^)]+)\]', '', string4)
     string6 = re.sub('\[([^)]+)\]', '', string5)
     string7 = re.sub('\(([^)]+)', '', string6)
@@ -129,26 +129,3 @@ def are_clean_cities_in_bios(dic, key):
             dummies.append(0)
 
     return dummies
-
-# print(len(location_list(orte_bio_output(data_path))))
-
-#d=location_list(orte_output(data_path))
-#d_list = []
-
-#for key, value in d.items():
-    #    temp = [key, value]
-#    d_list.append(temp)
-
-#d_list.sort(key=lambda x: -x[1])
-
-#for k in range(0, 99):
-#   print(d_list[k])
-
-
-# print(len(locationList(orte_output(data_path))))
-
-
-
-
-
-
