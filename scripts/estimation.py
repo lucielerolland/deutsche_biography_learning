@@ -33,61 +33,61 @@ def build_x_and_y(path):
 
     # Build y
 
-    y = []
+    is_a_living_city = []
     city_list = []
     sentence = []
 
     for k in people:
-    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+        # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
             if is_a_city_match == 1:
                 city_list += c0
                 sentence.append(add_sentence)
                 if c0 in full_dic[k]['orte'].values():
-                    y.append(1)
+                    is_a_living_city.append(1)
                 else:
-                    y.append(0)
+                    is_a_living_city.append(0)
 
-    y = np.transpose(np.mat(y))
+    is_a_living_city = np.transpose(np.mat(is_a_living_city))
 
-    print(len(y))
+    print(len(is_a_living_city))
     print(len(sentence))
 
     # Build features
 
-    x_no_intercept = cbm.train_sentence_to_matrix(sentence)
+    features_no_intercept = cbm.train_sentence_to_matrix(sentence)
 
-    x_no_intercept_cr = cbm.centered_reduced(x_no_intercept)
+    features_no_intercept_cr = cbm.centered_reduced(features_no_intercept)
 
     intercept = np.transpose(np.mat(np.ones(len(sentence))))
 
-    x = np.concatenate((intercept, x_no_intercept_cr), axis=1)
+    features = np.concatenate((intercept, features_no_intercept_cr), axis=1)
 
-    return x, y
+    return features, is_a_living_city
 
 # Separate train & test
 
 
-def train_and_test(x, y):
+def train_and_test(features, is_a_living_city):
 
-    n_test = round(np.shape(y)[0]*0.2)
+    n_test = round(np.shape(is_a_living_city)[0]*0.2)
 
-    test_sample = random.sample(range(0, len(y)), n_test)
+    test_sample = random.sample(range(0, len(is_a_living_city)), n_test)
 
     train_sample = []
 
-    for k in range(len(y)):
+    for k in range(len(is_a_living_city)):
         if k not in test_sample:
             train_sample.append(k)
 
-    test_y = y[test_sample]
-    train_y = y[train_sample]
+    test_is_a_living_city = is_a_living_city[test_sample]
+    train_is_a_living_city = is_a_living_city[train_sample]
 
-    test_x = x[test_sample]
-    train_x = x[train_sample]
+    test_features = features[test_sample]
+    train_features = features[train_sample]
 
-    return train_x, train_y, test_x, test_y
+    return train_features, train_is_a_living_city, test_features, test_is_a_living_city
 
 # Gradient descent
 
@@ -130,6 +130,6 @@ for i in range(np.shape(test_pred_y)[0]):
     if test_pred_y[i] == y[i]:
         exact_pred += 1
 
- # print(test_pred_y)
+# print(test_pred_y)
 
 print(exact_pred/total)
