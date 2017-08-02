@@ -7,83 +7,101 @@ import random
 
 # Import input & output
 
-data_path = '../data/'
 
-biographies = ei.bio_orte_input(data_path)
+def build_x_and_y(path):
 
-locations = eo.orte_bio_output(data_path)
+    biographies = ei.bio_orte_input(path)
 
-dic_input = ei.bio_into_people_dic(biographies, dic1={})
+    locations = eo.orte_bio_output(path)
 
-full_dic = eo.orte_into_people_dic(locations, dic1=dic_input)
+    dic_input = ei.bio_into_people_dic(biographies, dic1={})
 
-people = full_dic.keys()
+    full_dic = eo.orte_into_people_dic(locations, dic1=dic_input)
 
-ref_cities_dic = eo.location_list(locations)
+    people = full_dic.keys()
 
-ref_cities_unclean = ref_cities_dic.keys()
+    ref_cities_dic = eo.location_list(locations)
 
-ref_cities_clean = []
+    ref_cities_unclean = ref_cities_dic.keys()
 
-for k in ref_cities_unclean:
-    clean = eo.clean_city(k)
-    if clean not in ref_cities_clean:
-        ref_cities_clean.append(clean)
+    ref_cities_clean = []
 
-# Build y
+    for k in ref_cities_unclean:
+        clean = eo.clean_city(k)
+        if clean not in ref_cities_clean:
+            ref_cities_clean.append(clean)
 
-y = []
-city_list = []
-sentence = []
+    # Build y
 
-for k in people:
-# for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
-    for c0 in set(ref_cities_clean):
-        is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
-        if is_a_city_match == 1:
-            city_list += c0
-            sentence.append(add_sentence)
-            if c0 in full_dic[k]['orte'].values():
-                y.append(1)
-            else:
-                y.append(0)
+    y = []
+    city_list = []
+    sentence = []
 
-city_list_effectifs = {}
+    for k in people:
+    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+        for c0 in set(ref_cities_clean):
+            is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
+            if is_a_city_match == 1:
+                city_list += c0
+                sentence.append(add_sentence)
+                if c0 in full_dic[k]['orte'].values():
+                    y.append(1)
+                else:
+                    y.append(0)
 
-y = np.transpose(np.mat(y))
+    y = np.transpose(np.mat(y))
 
-print(len(y))
-print(len(sentence))
+    print(len(y))
+    print(len(sentence))
 
-# Build features
+    # Build features
 
-x_no_intercept = cbm.train_sentence_to_matrix(sentence)
+    x_no_intercept = cbm.train_sentence_to_matrix(sentence)
 
-x_no_intercept_cr = cbm.centered_reduced(x_no_intercept)
+    x_no_intercept_cr = cbm.centered_reduced(x_no_intercept)
 
-intercept = np.transpose(np.mat(np.ones(len(sentence))))
+    intercept = np.transpose(np.mat(np.ones(len(sentence))))
 
-x = np.concatenate((intercept, x_no_intercept_cr), axis=1)
+    x = np.concatenate((intercept, x_no_intercept_cr), axis=1)
+
+    return x, y
 
 # Separate train & test
 
-n_test = round(np.shape(y)[0]*0.2)
 
-test_sample = random.sample(range(0, len(y)), n_test)
+def train_and_test(x, y):
 
-train_sample = []
+    n_test = round(np.shape(y)[0]*0.2)
 
-for k in range(len(y)):
-    if k not in test_sample:
-        train_sample.append(k)
+    test_sample = random.sample(range(0, len(y)), n_test)
 
-test_y = y[test_sample]
-train_y = y[train_sample]
+    train_sample = []
 
-test_x = x[test_sample]
-train_x = x[train_sample]
+    for k in range(len(y)):
+        if k not in test_sample:
+            train_sample.append(k)
+
+    test_y = y[test_sample]
+    train_y = y[train_sample]
+
+    test_x = x[test_sample]
+    train_x = x[train_sample]
+
+    return train_x, train_y, test_x, test_y
 
 # Gradient descent
+
+x, y = build_x_and_y('../data/')
+
+np.save('x.npy', x)
+
+np.save('y.npy', y)
+
+# x = np.load('x.npy')
+
+# y = np.load('y.npy')
+
+train_x, train_y, test_x, test_y = train_and_test(x, y)
 
 iterations = 15000
 alpha = 0.1
@@ -112,6 +130,6 @@ for i in range(np.shape(test_pred_y)[0]):
     if test_pred_y[i] == y[i]:
         exact_pred += 1
 
-# print(test_pred_y)
+ # print(test_pred_y)
 
 print(exact_pred/total)
