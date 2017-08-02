@@ -38,6 +38,7 @@ def gradient_update(alpha, x, beta, y, l, has_constant=True):
 def pred(x, beta):
     z = sigmoid(x.dot(beta))
     pred_y = np.around(z)
+    pred_y = pred_y.astype('int')
 
     return pred_y
 

@@ -4,6 +4,7 @@ import city_bio_matching as cbm
 import log_regression as lr
 import numpy as np
 import random
+import pandas as pd
 
 # Import input & output
 
@@ -36,17 +37,19 @@ y = []
 city_list = []
 sentence = []
 
-# for k in people:
-for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
-        for c0 in ref_cities_clean:
-            add_city_list, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
-            city_list += add_city_list
-            sentence += add_sentence
-            for c1 in add_city_list:
-                if c1 in full_dic[k]['orte']:
-                    y.append(1)
-                else:
-                    y.append(0)
+for k in people:
+# for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    for c0 in ref_cities_clean:
+        add_city_list, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
+        city_list += add_city_list
+        sentence += add_sentence
+        for c1 in add_city_list:
+            if c1 in eo.clean_city_list(list(full_dic[k]['orte'].values())):
+                y.append(1)
+            else:
+                y.append(0)
+
+city_list_effectifs = {}
 
 y = np.transpose(np.mat(y))
 
@@ -80,7 +83,7 @@ train_x = x[train_sample]
 
 # Gradient descent
 
-iterations = 150000
+iterations = 15000
 alpha = 0.1
 l = 0.1
 
@@ -103,6 +106,8 @@ total = 0
 for i in range(np.shape(test_pred_y)[0]):
     total += 1
     if test_pred_y[i] == y[i]:
-        exact_pred =+ 1
+        exact_pred += 1
+
+# print(test_pred_y)
 
 print(exact_pred/total)

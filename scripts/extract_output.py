@@ -86,13 +86,15 @@ def location_list(matrix):
     loc = {}
     i = 0
     while i < len(matrix):
-        if matrix['cities'][i] != '' and matrix['cities'][i] not in loc.keys():
-            loc[matrix['cities'][i]] = 1
-        else:
-            loc[matrix['cities'][i]] = loc[matrix['cities'][i]] + 1
+        if re.search('^[a-zA-ZäöüßÄÖÜ]+', matrix['cities'][i]):
+            if matrix['cities'][i] not in loc.keys():
+                loc[matrix['cities'][i]] = 1
+            else:
+                loc[matrix['cities'][i]] = loc[matrix['cities'][i]] + 1
         i = i+1
 
     return loc
+
 
 def clean_city(string):
     string1 = re.sub(' \(([^)]+)\)', '', string)
@@ -107,6 +109,14 @@ def clean_city(string):
     string10 = re.sub('\?', '', string9)
 
     return string10
+
+
+def clean_city_list(city_list):
+    cleaned_city_list = []
+    for i in range(len(city_list)):
+        cleaned_city_list.append(clean_city(city_list[i]))
+
+    return cleaned_city_list
 
 
 def are_clean_cities_in_bios(dic, key):
