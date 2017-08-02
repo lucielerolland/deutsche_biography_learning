@@ -14,15 +14,15 @@ def cut_into_sentences(paragraph):
 
 
 def city_match_sentence(biography, clean_city):
-    sentence = []
-    long_clean_city = []
+    sentence = ''
+    city_match_indicator = 0
     cut_biography = cut_into_sentences(biography)
     for k in cut_biography:
         if re.search(clean_city, k):
-            sentence.append(k)
-            long_clean_city.append(clean_city)
+            sentence += k + ' '
+            city_match_indicator = 1
 
-    return long_clean_city, sentence
+    return city_match_indicator, sentence
 
 
 def is_city_in_orte(clean_city, orte):

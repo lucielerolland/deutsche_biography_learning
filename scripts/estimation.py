@@ -4,7 +4,6 @@ import city_bio_matching as cbm
 import log_regression as lr
 import numpy as np
 import random
-import pandas as pd
 
 # Import input & output
 
@@ -39,12 +38,12 @@ sentence = []
 
 for k in people:
 # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
-    for c0 in ref_cities_clean:
-        add_city_list, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
-        city_list += add_city_list
-        sentence += add_sentence
-        for c1 in add_city_list:
-            if c1 in eo.clean_city_list(list(full_dic[k]['orte'].values())):
+    for c0 in set(ref_cities_clean):
+        is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
+        if is_a_city_match == 1:
+            city_list += c0
+            sentence.append(add_sentence)
+            if c0 in full_dic[k]['orte'].values():
                 y.append(1)
             else:
                 y.append(0)
@@ -52,6 +51,9 @@ for k in people:
 city_list_effectifs = {}
 
 y = np.transpose(np.mat(y))
+
+print(len(y))
+print(len(sentence))
 
 # Build features
 
@@ -91,6 +93,8 @@ beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))
 
 cost = []
 index = []
+
+print("Starting training")
 
 for i in range(iterations):
     beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
