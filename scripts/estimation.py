@@ -91,15 +91,15 @@ def train_and_test(features, is_a_living_city):
 
 # Gradient descent
 
-x, y = build_x_and_y('../data/')
+# x, y = build_x_and_y('../data/')
 
-np.save('x.npy', x)
+# np.save('x.npy', x)
 
-np.save('y.npy', y)
+# np.save('y.npy', y)
 
-# x = np.load('x.npy')
+x = np.load('x.npy')
 
-# y = np.load('y.npy')
+y = np.load('y.npy')
 
 train_x, train_y, test_x, test_y = train_and_test(x, y)
 
