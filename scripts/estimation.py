@@ -4,6 +4,7 @@ import city_bio_matching as cbm
 import log_regression as lr
 import numpy as np
 import random
+from datetime import datetime
 
 # Import input & output
 
@@ -105,7 +106,8 @@ train_x, train_y, test_x, test_y = train_and_test(x, y)
 
 iterations = 15000
 alpha = 0.1
-l = 0.1
+
+l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10]
 
 beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))
 
@@ -114,22 +116,24 @@ index = []
 
 print("Starting training")
 
-for i in range(iterations):
-    beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
-    cost.append(lr.cost(train_x, beta, train_y, l))
+for l in l_list:
+    print(datetime.now())
+    for i in range(iterations):
+        beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
+        cost.append(lr.cost(train_x, beta, train_y, l))
 
-# Compute perf on test
+    # Compute perf on test
 
-test_pred_y = lr.pred(test_x, beta)
+    test_pred_y = lr.pred(test_x, beta)
 
-exact_pred = 0
-total = 0
+    exact_pred = 0
+    total = 0
 
-for i in range(np.shape(test_pred_y)[0]):
-    total += 1
-    if test_pred_y[i] == y[i]:
-        exact_pred += 1
+    for i in range(np.shape(test_pred_y)[0]):
+        total += 1
+        if test_pred_y[i] == y[i]:
+            exact_pred += 1
 
-# print(test_pred_y)
+    # print(test_pred_y)
 
-print(exact_pred/total)
+    print('l : ' + l + ', score : ' + exact_pred/total)
