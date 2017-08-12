@@ -117,7 +117,6 @@ index = []
 print("Starting training")
 
 for l in l_list:
-    print(datetime.now())
     for i in range(iterations):
         beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
         cost.append(lr.cost(train_x, beta, train_y, l))
@@ -136,4 +135,4 @@ for l in l_list:
 
     # print(test_pred_y)
 
-    print('l : ' + l + ', score : ' + exact_pred/total)
+    print('l : ' + str(l) + ', score : ' + str(exact_pred/total))
