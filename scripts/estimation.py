@@ -5,6 +5,7 @@ import log_regression as lr
 import numpy as np
 import random
 from datetime import datetime
+from sklearn.feature_extraction.text import CountVectorizer
 
 # Import input & output
 
@@ -38,8 +39,8 @@ def build_x_and_y(path):
     city_list = []
     sentence = []
 
-    for k in people:
-        # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    # for k in people:
+    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
             if is_a_city_match == 1:
@@ -57,7 +58,10 @@ def build_x_and_y(path):
 
     # Build features
 
-    features_no_intercept = cbm.train_sentence_to_matrix(sentence)
+    word_vect = CountVectorizer(analyzer="word", tokenizer=None, preprocessor=None, stop_words=ref_cities_clean,
+                                max_features=5000)
+
+    features_no_intercept = cbm.train_sentence_to_matrix(sentence, word_vect)
 
     features_no_intercept_cr = cbm.centered_reduced(features_no_intercept)
 
@@ -92,15 +96,15 @@ def train_and_test(features, is_a_living_city):
 
 # Gradient descent
 
-# x, y = build_x_and_y('../data/')
+x, y = build_x_and_y('../data/')
 
-# np.save('x.npy', x)
+np.save('x.npy', x)
 
-# np.save('y.npy', y)
+np.save('y.npy', y)
 
-x = np.load('x.npy')
+# x = np.load('x.npy')
 
-y = np.load('y.npy')
+# y = np.load('y.npy')
 
 train_x, train_y, test_x, test_y = train_and_test(x, y)
 
@@ -114,7 +118,7 @@ beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))
 cost = []
 index = []
 
-print("Starting training")
+print("Starting training at time : " + str(datetime.now()))
 
 for l in l_list:
     for i in range(iterations):
@@ -135,4 +139,4 @@ for l in l_list:
 
     # print(test_pred_y)
 
-    print('l : ' + str(l) + ', score : ' + str(exact_pred/total))
+    print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', score : ' + str(exact_pred/total))

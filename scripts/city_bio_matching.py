@@ -1,5 +1,4 @@
 import re
-from sklearn.feature_extraction.text import CountVectorizer
 import numpy as np
 
 
@@ -29,17 +28,15 @@ def is_city_in_orte(clean_city, orte):
 
     return city_in_orte_dummy
 
-word_vect = CountVectorizer(analyzer="word", tokenizer=None, preprocessor=None, stop_words=None, max_features=5000)
 
-
-def train_sentence_to_matrix(train_sentences):
-    train_features = word_vect.fit_transform(train_sentences)
+def train_sentence_to_matrix(train_sentences, vectorizer):
+    train_features = vectorizer.fit_transform(train_sentences)
 
     return train_features.toarray()
 
 
-def target_sentence_to_matrix(target_sentences):
-    target_features = word_vect.transform(target_sentences)
+def target_sentence_to_matrix(target_sentences, vectorizer):
+    target_features = vectorizer.transform(target_sentences)
 
     return target_features.toarray()
 
