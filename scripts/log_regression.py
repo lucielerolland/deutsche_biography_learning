@@ -7,7 +7,8 @@ def sigmoid(z):
 
 def cost(x, beta, y, l):
     m = np.shape(x)[0]
-    direct_cost_vect = -np.multiply(y, (sigmoid(x.dot(beta)))) - np.multiply((1-y), (1-sigmoid(x.dot(beta))))
+    yhat = sigmoid(x.dot(beta))
+    direct_cost_vect = -np.multiply(y, yhat) - np.multiply((1-y), (1-yhat))
     reg = (l/(2*m))*np.transpose(beta).dot(beta)
     full_cost = 1/m*np.sum(direct_cost_vect) + reg
 

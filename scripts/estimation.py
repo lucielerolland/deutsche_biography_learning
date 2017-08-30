@@ -39,8 +39,8 @@ def build_x_and_y(path):
     city_list = []
     sentence = []
 
-    # for k in people:
-    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    for k in people:
+    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
             if is_a_city_match == 1:
@@ -113,7 +113,7 @@ alpha = 0.1
 
 l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10]
 
-beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))
+beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))*0.01
 
 cost = []
 index = []
