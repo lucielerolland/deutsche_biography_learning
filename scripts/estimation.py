@@ -109,9 +109,12 @@ y = np.load('y.npy')
 train_x, train_y, test_x, test_y = train_and_test(x, y)
 
 iterations = 15000
-alpha = 0.1
 
-l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10]
+# alpha_list = [0.1]
+alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
+
+l_list = [0.1]
+# l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
 beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))*0.01
 
@@ -121,22 +124,33 @@ index = []
 print("Starting training at time : " + str(datetime.now()))
 
 for l in l_list:
-    for i in range(iterations):
-        beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
-        cost.append(lr.cost(train_x, beta, train_y, l))
+    for alpha in alpha_list:
+        for i in range(iterations):
+            beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
+            cost.append(lr.cost(train_x, beta, train_y, l))
 
-    # Compute perf on test
+        # Compute perf on test
 
-    test_pred_y = lr.pred(test_x, beta)
+        pred_y_train = lr.pred(train_x, beta)
+        pred_y_test = lr.pred(test_x, beta)
 
-    exact_pred = 0
-    total = 0
+        exact_pred_train = 0
+        exact_pred_test = 0
 
-    for i in range(np.shape(test_pred_y)[0]):
-        total += 1
-        if test_pred_y[i] == y[i]:
-            exact_pred += 1
+        total_train = 0
+        total_test = 0
 
-    # print(test_pred_y)
+        for i in range(np.shape(pred_y_train)[0]):
+            total_train += 1
+            if pred_y_train[i] == train_y[i]:
+                exact_pred_train += 1
 
-    print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', score : ' + str(exact_pred/total))
+        for i in range(np.shape(pred_y_test)[0]):
+            total_test += 1
+            if pred_y_test[i] == test_y[i]:
+                exact_pred_test += 1
+
+        # print(test_pred_y)
+
+        print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', alpha : ' + str(alpha) + ', score train : '
+              + str(exact_pred_train/total_train) + ', score test : ' + str(exact_pred_test/total_test))
