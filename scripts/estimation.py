@@ -108,13 +108,14 @@ y = np.load('y.npy')
 
 train_x, train_y, test_x, test_y = train_and_test(x, y)
 
-iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
+iterations_list = [1000]
+# iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
 
 alpha_list = [0.3]
 # alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
-l_list = [0.1]
-# l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
+# l_list = [0.1]
+l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
 beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))*0.01
 
@@ -150,8 +151,6 @@ for l in l_list:
                 total_test += 1
                 if pred_y_test[i] == test_y[i]:
                     exact_pred_test += 1
-
-            # print(test_pred_y)
 
             print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', alpha : ' + str(alpha) +
                   ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train/total_train) +
