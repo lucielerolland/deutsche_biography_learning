@@ -39,17 +39,25 @@ def build_x_and_y(path):
     city_list = []
     sentence = []
 
-    for k in people:
-    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    # for k in people:
+    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
             if is_a_city_match == 1:
                 city_list += c0
-                sentence.append(add_sentence)
-                if c0 in full_dic[k]['orte'].values():
-                    is_a_living_city.append(1)
-                else:
+                if ('tod' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['tod']) or \
+                        ('grab' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['grab']):
+                    is_a_living_city.append(3)
+                    sentence.append(add_sentence)
+                elif 'geburt' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['geburt']:
+                    sentence.append(add_sentence)
+                    is_a_living_city.append(2)
+                elif c0 not in full_dic[k]['orte'].values():
+                    sentence.append(add_sentence)
                     is_a_living_city.append(0)
+                else:
+                    sentence.append(add_sentence)
+                    is_a_living_city.append(1)
 
     is_a_living_city = np.transpose(np.mat(is_a_living_city))
 
@@ -74,7 +82,7 @@ def build_x_and_y(path):
 # Separate train & test
 
 
-def train_and_test(features, is_a_living_city):
+def train_and_test(features, is_a_living_city, is_a_living_city_dummies):
 
     n_test = round(np.shape(is_a_living_city)[0]*0.2)
 
@@ -92,21 +100,30 @@ def train_and_test(features, is_a_living_city):
     test_features = features[test_sample]
     train_features = features[train_sample]
 
-    return train_features, train_is_a_living_city, test_features, test_is_a_living_city
+    test_is_a_living_city_dummies = is_a_living_city_dummies[test_sample]
+    train_is_a_living_city_dummies = is_a_living_city_dummies[train_sample]
+
+    return train_features, train_is_a_living_city, train_is_a_living_city_dummies, test_features, test_is_a_living_city\
+        , test_is_a_living_city_dummies
 
 # Gradient descent
 
 x, y = build_x_and_y('../data/')
 
-# np.save('x.npy', x)
+np.save('x.npy', x)
 
-# np.save('y.npy', y)
+np.save('y.npy', y)
 
-x = np.load('x.npy')
+# x = np.load('x.npy')
 
-y = np.load('y.npy')
+# y = np.load('y.npy')
 
-train_x, train_y, test_x, test_y = train_and_test(x, y)
+# Number of classes
+K = 4
+
+y_dummies = lr.y_to_dummies(y, K)
+
+train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies = train_and_test(x, y, y_dummies)
 
 iterations_list = [1000]
 # iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
@@ -114,10 +131,10 @@ iterations_list = [1000]
 alpha_list = [0.3]
 # alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
-# l_list = [0.1]
-l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
+l_list = [0]
+# l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
-beta = np.transpose(np.mat(np.random.randn(np.shape(x)[1])))*0.01
+beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
 
 cost = []
 index = []
@@ -128,8 +145,11 @@ for l in l_list:
     for alpha in alpha_list:
         for iterations in iterations_list:
             for i in range(iterations):
-                beta = lr.gradient_update(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, has_constant=True)
-                cost.append(lr.cost(train_x, beta, train_y, l))
+                beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, has_constant=True)
+                cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+
+                if i % 100 == 0:
+                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
 
             # Compute perf on test
 
