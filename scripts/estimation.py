@@ -108,15 +108,15 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies):
 
 # Gradient descent
 
-x, y = build_x_and_y('../data/')
+# x, y = build_x_and_y('../data/')
 
-np.save('x.npy', x)
+# np.save('x.npy', x)
 
-np.save('y.npy', y)
+# np.save('y.npy', y)
 
-# x = np.load('x.npy')
+x = np.load('x.npy')
 
-# y = np.load('y.npy')
+y = np.load('y.npy')
 
 # Number of classes
 K = 4
