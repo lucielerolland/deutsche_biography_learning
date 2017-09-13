@@ -128,10 +128,12 @@ train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies = train_and_te
 iterations_list = [1000]
 # iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
 
-alpha_list = [0.3]
+# alpha_list = [0.01]
 # alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
-l_list = [0]
+alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3]
+
+l_list = [0.1]
 # l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
 beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01

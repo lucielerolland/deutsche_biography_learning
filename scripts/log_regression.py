@@ -28,8 +28,8 @@ def cost(x, beta, y, l, activation):
     elif activation == 'softmax':
         y_hat = softmax(x.dot(beta))
         direct_cost_vect = -np.multiply(y,y_hat)
-        reg = (l / (2 * m)) * np.transpose(beta).dot(beta)
-        full_cost = 1 / m * np.sum(direct_cost_vect) + np.sum(reg)
+        reg = (l / (2 * m)) * np.multiply(beta, beta)
+        full_cost = 1 / m * (np.sum(direct_cost_vect) + np.sum(reg))
 
     return full_cost
 
