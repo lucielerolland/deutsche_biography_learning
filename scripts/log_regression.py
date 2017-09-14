@@ -7,7 +7,7 @@ def sigmoid(z):
 
 def softmax(vector):
     exp_vector = np.exp(vector)
-    return exp_vector/np.exp(np.sum(exp_vector, axis=1))#, keepdims=True))
+    return exp_vector/np.exp(np.sum(exp_vector, axis=1))
 
 
 def y_to_dummies(vector, K):
