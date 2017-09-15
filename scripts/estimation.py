@@ -125,6 +125,8 @@ y_dummies = lr.y_to_dummies(y, K)
 
 train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies = train_and_test(x, y, y_dummies)
 
+epsilon = 1e-7
+
 iterations_list = [1000]
 # iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
 
@@ -133,47 +135,51 @@ iterations_list = [1000]
 
 alpha_list = [1, 3, 10, 30, 100, 300, 1000]
 
-l_list = [0.1]
+l_list = [0.]
 # l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
-beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
+# beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
+
+beta = np.mat(np.zeros((x.shape[1], y_dummies.shape[1])))
 
 cost = []
 index = []
 
 print("Starting training at time : " + str(datetime.now()))
 
-for l in l_list:
-    for alpha in alpha_list:
-        for iterations in iterations_list:
-            for i in range(iterations):
-                beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, has_constant=True)
-                cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+print(lr.gradient_checker(x=x, y=y, beta=beta, epsilon=epsilon, l=l_list[0], has_constant=True))
+#for l in l_list:
+#    for alpha in alpha_list:
+#        for iterations in iterations_list:
+#            for i in range(iterations):
+#                beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, activation='softmax', has_constant=True)
+#                cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
 
-                if i % 100 == 0:
-                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+#                if i % 100 == 0:
+#                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+#                    print(lr.gradient_checker(x=x, y=y, beta=beta, epsilon=epsilon, l=l_list[0], has_constant=True))
 
             # Compute perf on test
 
-            pred_y_train = lr.pred(train_x, beta)
-            pred_y_test = lr.pred(test_x, beta)
+#            pred_y_train = lr.pred(train_x, beta)
+#            pred_y_test = lr.pred(test_x, beta)
 
-            exact_pred_train = 0
-            exact_pred_test = 0
+#            exact_pred_train = 0
+#            exact_pred_test = 0
 
-            total_train = 0
-            total_test = 0
+#            total_train = 0
+#            total_test = 0
 
-            for i in range(np.shape(pred_y_train)[0]):
-                total_train += 1
-                if pred_y_train[i] == train_y[i]:
-                    exact_pred_train += 1
+#            for i in range(np.shape(pred_y_train)[0]):
+#                total_train += 1
+#                if pred_y_train[i] == train_y[i]:
+#                    exact_pred_train += 1
 
-            for i in range(np.shape(pred_y_test)[0]):
-                total_test += 1
-                if pred_y_test[i] == test_y[i]:
-                    exact_pred_test += 1
+#            for i in range(np.shape(pred_y_test)[0]):
+#                total_test += 1
+#                if pred_y_test[i] == test_y[i]:
+#                    exact_pred_test += 1
 
-            print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', alpha : ' + str(alpha) +
-                  ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train/total_train) +
-                  ', score test : ' + str(exact_pred_test/total_test))
+#            print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', alpha : ' + str(alpha) +
+#                  ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train/total_train) +
+#                  ', score test : ' + str(exact_pred_test/total_test))
