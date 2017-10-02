@@ -114,6 +114,8 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies):
 
 # np.save('y.npy', y)
 
+print("Starting loading at time : " + str(datetime.now()))
+
 x = np.load('x.npy')
 
 y = np.load('y.npy')
@@ -147,7 +149,7 @@ print("Starting training at time : " + str(datetime.now()))
 for l in l_list:
     for alpha in alpha_list:
         for iterations in iterations_list:
-            beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))
+            beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
             for i in range(iterations):
                 beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, activation='softmax', has_constant=True)
                 cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
