@@ -56,7 +56,7 @@ def build_x_and_y(path):
                 elif 'geburt' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['geburt']:
                     sentence.append(add_sentence)
                     is_a_living_city.append(2)
-                elif c0 in full_dic[k]['orte']['wirk']:
+                elif 'wirk' in full_dic[k]['clean_orte'].keys() and c0 in full_dic[k]['orte']['wirk']:
                     sentence.append(add_sentence)
                     is_a_living_city.append(1)
                 else:
