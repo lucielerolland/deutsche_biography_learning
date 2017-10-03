@@ -120,6 +120,8 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies): #, cit
 
 # Gradient descent
 
+print("Starting building at time : " + str(datetime.now()))
+
 x, y = build_x_and_y('../data/')
 
 np.save('x.npy', x)
@@ -128,7 +130,7 @@ np.save('y.npy', y)
 
 # np.save('scholar_dic.npy', scholar_dic)
 
-print("Starting loading at time : " + str(datetime.now()))
+# print("Starting loading at time : " + str(datetime.now()))
 
 # x = np.load('x.npy')
 
@@ -140,8 +142,6 @@ print("Starting loading at time : " + str(datetime.now()))
 K = 4
 
 y_dummies = lr.y_to_dummies(y, K)
-
-print(city_list)
 
 train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies, test_city_list, train_city_list, test_scholar\
     , train_scholar = train_and_test(x, y, y_dummies) #, np.matrix(city_list).T, np.matrix(scholar).T)
