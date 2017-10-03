@@ -122,9 +122,9 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies): #, cit
 
 x, y = build_x_and_y('../data/')
 
-# np.save('x.npy', x)
+np.save('x.npy', x)
 
-# np.save('y.npy', y)
+np.save('y.npy', y)
 
 # np.save('scholar_dic.npy', scholar_dic)
 
