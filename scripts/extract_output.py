@@ -57,26 +57,73 @@ def orte_bio_output(dir_prefix):
     return output
 
 
+def clean_city(string):
+    string1 = re.sub(' \(([^)]+)\)', '', string)
+    string2 = re.sub('\(([^)]+)\)', '', string1)
+    string3 = re.sub(' <([^)]+)>', '', string2)
+    string4 = re.sub('<([^)]+)>', '', string3)
+    string5 = re.sub(' \[([^)]+)\]', '', string4)
+    string6 = re.sub('\[([^)]+)\]', '', string5)
+    string7 = re.sub('\(([^)]+)', '', string6)
+    string8 = re.sub('\(', '', string7)
+    string9 = re.sub('\)', '', string8)
+    string10 = re.sub('\?', '', string9)
+
+    return string10
+
+
 def orte_into_people_dic(matrix, dic1):
     dic2 = dic1
     i = 0
     while i < len(matrix):
         if matrix['idn'][i] != '':
             try:
-                if 'orte' in dic2[matrix['idn'][i]].keys():
-                    dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                if re.search('wirk', matrix['funct'][i]):
+                    if 'orte' not in dic2[matrix['idn'][i]].keys():
+                        dic2[matrix['idn'][i]]['orte'] = {}
+                        dic2[matrix['idn'][i]]['clean_orte'] = {}
+                    if 'wirk' not in dic2[matrix['idn'][i]]['orte'].keys():
+                        dic2[matrix['idn'][i]]['orte']['wirk'] = []
+                        dic2[matrix['idn'][i]]['orte']['wirk'].append(matrix['cities'][i])
+                        dic2[matrix['idn'][i]]['clean_orte']['wirk'] = []
+                        dic2[matrix['idn'][i]]['clean_orte']['wirk'].append(clean_city(matrix['cities'][i]))
+                    else:
+                        dic2[matrix['idn'][i]]['orte']['wirk'].append(matrix['cities'][i])
+                        dic2[matrix['idn'][i]]['clean_orte']['wirk'].append(clean_city(matrix['cities'][i]))
                 else:
-                    dic2[matrix['idn'][i]]['orte'] = {}
-                    dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                    if 'orte' not in dic2[matrix['idn'][i]].keys():
+                        dic2[matrix['idn'][i]]['orte'] = {}
+                        dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                        dic2[matrix['idn'][i]]['clean_orte'] = {}
+                        dic2[matrix['idn'][i]]['clean_orte'][matrix['funct'][i]] = clean_city(matrix['cities'][i])
+                    else:
+                        dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                        dic2[matrix['idn'][i]]['clean_orte'][matrix['funct'][i]] = clean_city(matrix['cities'][i])
             except KeyError:
                 dic2[matrix['idn'][i]] = {}
                 dic2[matrix['idn'][i]]['idn'] = matrix['idn'][i]
                 dic2[matrix['idn'][i]]['name'] = matrix['name'][i]
-                if 'orte' in dic2[matrix['idn'][i]].keys():
-                    dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                if re.search('wirk', matrix['funct'][i]):
+                    if 'orte' not in dic2[matrix['idn'][i]].keys():
+                        dic2[matrix['idn'][i]]['orte'] = {}
+                        dic2[matrix['idn'][i]]['clean_orte'] = {}
+                    if 'wirk' not in dic2[matrix['idn'][i]]['orte'].keys():
+                        dic2[matrix['idn'][i]]['orte']['wirk'] = []
+                        dic2[matrix['idn'][i]]['orte']['wirk'].append(matrix['cities'][i])
+                        dic2[matrix['idn'][i]]['clean_orte']['wirk'] = []
+                        dic2[matrix['idn'][i]]['clean_orte']['wirk'].append(clean_city(matrix['cities'][i]))
+                    else:
+                        dic2[matrix['idn'][i]]['orte']['wirk'].append(matrix['cities'][i])
+                        dic2[matrix['idn'][i]]['clean_orte']['wirk'].append(clean_city(matrix['cities'][i]))
                 else:
-                    dic2[matrix['idn'][i]]['orte'] = {}
-                    dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                    if 'orte' not in dic2[matrix['idn'][i]].keys():
+                        dic2[matrix['idn'][i]]['orte'] = {}
+                        dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                        dic2[matrix['idn'][i]]['clean_orte'] = {}
+                        dic2[matrix['idn'][i]]['clean_orte'][matrix['funct'][i]] = clean_city(matrix['cities'][i])
+                    else:
+                        dic2[matrix['idn'][i]]['orte'][matrix['funct'][i]] = matrix['cities'][i]
+                        dic2[matrix['idn'][i]]['clean_orte'][matrix['funct'][i]] = clean_city(matrix['cities'][i])
         i = i+1
 
     return dic2
@@ -94,21 +141,6 @@ def location_list(matrix):
         i = i+1
 
     return loc
-
-
-def clean_city(string):
-    string1 = re.sub(' \(([^)]+)\)', '', string)
-    string2 = re.sub('\(([^)]+)\)', '', string1)
-    string3 = re.sub(' <([^)]+)>', '', string2)
-    string4 = re.sub('<([^)]+)>', '', string3)
-    string5 = re.sub(' \[([^)]+)\]', '', string4)
-    string6 = re.sub('\[([^)]+)\]', '', string5)
-    string7 = re.sub('\(([^)]+)', '', string6)
-    string8 = re.sub('\(', '', string7)
-    string9 = re.sub('\)', '', string8)
-    string10 = re.sub('\?', '', string9)
-
-    return string10
 
 
 def clean_city_list(city_list):

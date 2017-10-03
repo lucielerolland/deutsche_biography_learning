@@ -49,7 +49,6 @@ def cost(x, beta, y, l, activation, has_constant=True):
 def gradient(x, beta, y, l, activation, has_constant=True):
     m = np.shape(x)[0]
     k = np.shape(x)[1]
-    class_num = np.shape(y)[1]
     if has_constant:
         mult = np.identity(k, dtype=float)
         mult[0, 0] = 0

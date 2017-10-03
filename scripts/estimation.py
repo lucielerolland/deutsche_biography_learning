@@ -38,31 +38,36 @@ def build_x_and_y(path):
     is_a_living_city = []
     city_list = []
     sentence = []
+    scholar = []
 
     # for k in people:
     for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+        full_dic[k]['extracted_orte'] = {}
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
             if is_a_city_match == 1:
-                city_list += c0
+                city_list.append(c0)
+                scholar.append(k)
                 if ('tod' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['tod']) or \
-                        ('grab' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['grab']):
+                        ('grab' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['grab']):
                     is_a_living_city.append(3)
                     sentence.append(add_sentence)
-                elif 'geburt' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['geburt']:
+                elif 'geburt' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['geburt']:
                     sentence.append(add_sentence)
                     is_a_living_city.append(2)
-                elif c0 not in full_dic[k]['orte'].values():
-                    sentence.append(add_sentence)
-                    is_a_living_city.append(0)
-                else:
+                elif c0 in full_dic[k]['orte']['wirk']:
                     sentence.append(add_sentence)
                     is_a_living_city.append(1)
+                else:
+                    sentence.append(add_sentence)
+                    is_a_living_city.append(0)
 
     is_a_living_city = np.transpose(np.mat(is_a_living_city))
 
     print(len(is_a_living_city))
     print(len(sentence))
+    print(len(city_list))
+    print(len(scholar))
 
     # Build features
 
@@ -77,12 +82,12 @@ def build_x_and_y(path):
 
     features = np.concatenate((intercept, features_no_intercept_cr), axis=1)
 
-    return features, is_a_living_city
+    return features, is_a_living_city, full_dic, city_list, scholar
 
 # Separate train & test
 
 
-def train_and_test(features, is_a_living_city, is_a_living_city_dummies):
+def train_and_test(features, is_a_living_city, is_a_living_city_dummies, city_lists, scholars):
 
     n_test = round(np.shape(is_a_living_city)[0]*0.2)
 
@@ -103,29 +108,42 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies):
     test_is_a_living_city_dummies = is_a_living_city_dummies[test_sample]
     train_is_a_living_city_dummies = is_a_living_city_dummies[train_sample]
 
+    test_city_lists = city_lists[test_sample]
+    train_city_lists = city_lists[train_sample]
+
+    test_scholars = scholars[test_sample]
+    train_scholars = scholars[train_sample]
+
     return train_features, train_is_a_living_city, train_is_a_living_city_dummies, test_features, test_is_a_living_city\
-        , test_is_a_living_city_dummies
+        , test_is_a_living_city_dummies, test_city_lists, train_city_lists, test_scholars, train_scholars
 
 # Gradient descent
 
-# x, y = build_x_and_y('../data/')
+x, y, scholar_dic, city_list, scholar = build_x_and_y('../data/')
 
 # np.save('x.npy', x)
 
 # np.save('y.npy', y)
 
+# np.save('scholar_dic.npy', scholar_dic)
+
 print("Starting loading at time : " + str(datetime.now()))
 
-x = np.load('x.npy')
+# x = np.load('x.npy')
 
-y = np.load('y.npy')
+# y = np.load('y.npy')
+
+# scholar_dic = np.load('scholar_dic.npy')
 
 # Number of classes
 K = 4
 
 y_dummies = lr.y_to_dummies(y, K)
 
-train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies = train_and_test(x, y, y_dummies)
+print(city_list)
+
+train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies, test_city_list, train_city_list, test_scholar\
+    , train_scholar = train_and_test(x, y, y_dummies, np.matrix(city_list).T, np.matrix(scholar).T)
 
 epsilon = 1e-7
 
