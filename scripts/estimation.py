@@ -41,8 +41,8 @@ def build_x_and_y(path):
     sentence = []
     scholar = []
 
-    for k in people:
-    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    # for k in people:
+    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
         full_dic[k]['extracted_orte'] = {}
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
@@ -120,7 +120,7 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies): #, cit
 
 # Gradient descent
 
-rebuild = True
+rebuild = False
 
 if rebuild:
     print("Starting building at time : " + str(datetime.now()))
@@ -171,8 +171,8 @@ for l in l_list:
                 beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, activation='softmax', has_constant=True)
                 cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
 
-#                if i % 100 == 0:
-#                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+                if i % (iterations/5) == 0:
+                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
 #                    print(lr.gradient_checker(x=x, y=y, beta=beta, epsilon=epsilon, l=l_list[0], has_constant=True))
 
             # Compute perf on test
