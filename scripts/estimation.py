@@ -73,7 +73,7 @@ def build_x_and_y(path):
     # Build features
 
     word_vect = CountVectorizer(analyzer="word", tokenizer=None, preprocessor=None, stop_words=ref_cities_clean,
-                                max_features=5000)
+                                max_features=1000)
 
     features_no_intercept = cbm.train_sentence_to_matrix(sentence, word_vect)
 
@@ -120,21 +120,17 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies): #, cit
 
 # Gradient descent
 
-print("Starting building at time : " + str(datetime.now()))
+rebuild = True
 
-# x, y = build_x_and_y('../data/')
-
-# np.save('x.npy', x)
-
-# np.save('y.npy', y)
-
-# np.save('scholar_dic.npy', scholar_dic)
-
-print("Starting loading at time : " + str(datetime.now()))
-
-x = np.load('x.npy')
-
-y = np.load('y.npy')
+if rebuild:
+    print("Starting building at time : " + str(datetime.now()))
+    x, y = build_x_and_y('../data/')
+    np.save('x.npy', x)
+    np.save('y.npy', y)
+else:
+    print("Starting loading at time : " + str(datetime.now()))
+    x = np.load('x.npy')
+    y = np.load('y.npy')
 
 # scholar_dic = np.load('scholar_dic.npy')
 
@@ -175,8 +171,8 @@ for l in l_list:
                 beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, activation='softmax', has_constant=True)
                 cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
 
-                if i % 100 == 0:
-                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+#                if i % 100 == 0:
+#                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
 #                    print(lr.gradient_checker(x=x, y=y, beta=beta, epsilon=epsilon, l=l_list[0], has_constant=True))
 
             # Compute perf on test
