@@ -41,13 +41,14 @@ def build_x_and_y(path):
     sentence = []
     scholar = []
 
-    # for k in people:
-    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
-        full_dic[k]['extracted_orte'] = {}
+    for k in people:
+    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+        full_dic[k]['extracted_orte'] = []
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
             if is_a_city_match == 1:
                 city_list.append(c0)
+                full_dic[k]['extracted_orte'].append(c0)
                 scholar.append(k)
                 if ('tod' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['tod']) or \
                         ('grab' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['grab']):
@@ -62,6 +63,20 @@ def build_x_and_y(path):
                 else:
                     sentence.append(add_sentence)
                     is_a_living_city.append(0)
+        full_dic[k]['all_orte'] = []
+        for l in list(full_dic[k]['clean_orte'].keys()):
+            if isinstance(full_dic[k]['clean_orte'][l], list):
+                full_dic[k]['all_orte'] += list(full_dic[k]['clean_orte'][l])
+            else:
+                full_dic[k]['all_orte'].append(full_dic[k]['clean_orte'][l])
+        counter_in_orte = 0
+        counter_in_both = 0
+        for m in set(full_dic[k]['all_orte']):
+            counter_in_orte += 1
+            if m in full_dic[k]['extracted_orte']:
+                counter_in_both += 1
+
+    print('Share of matched cities', counter_in_both/counter_in_orte)
 
     is_a_living_city = np.transpose(np.mat(is_a_living_city))
 
@@ -120,7 +135,7 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies): #, cit
 
 # Gradient descent
 
-rebuild = False
+rebuild = True
 
 if rebuild:
     print("Starting building at time : " + str(datetime.now()))
@@ -146,8 +161,8 @@ train_x, train_y, train_y_dummies, test_x, test_y, test_y_dummies = train_and_te
 
 epsilon = 1e-7
 
-# iterations_list = [1000]
-iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
+iterations_list = [1000]
+# iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
 
 alpha_list = [0.3]
 # alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]

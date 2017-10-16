@@ -20,8 +20,8 @@ def city_match_sentence(biography, clean_city):
     return city_match_indicator, sentence
 
 
-def is_city_in_orte(clean_city, orte):
-    if clean_city in orte:
+def is_city_in_orte(clean_city, clean_orte):
+    if clean_city in clean_orte:
         city_in_orte_dummy = 1
     else:
         city_in_orte_dummy = 0
