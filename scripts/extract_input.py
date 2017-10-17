@@ -61,7 +61,7 @@ def bio_into_people_dic(matrix, dic1):
     dic2 = dic1
     i = 0
     while i < len(matrix):
-        if matrix['idn'][i] != '':
+        if matrix['idn'][i] != '' and not pd.isnull(matrix['idn'][i]):
             try:
                 dic2[matrix['idn'][i]]['leben'] = matrix['leben'][i]
             except KeyError:

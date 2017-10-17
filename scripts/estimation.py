@@ -21,7 +21,7 @@ def build_x_and_y(path):
 
     full_dic = eo.orte_into_people_dic(locations, dic1=dic_input)
 
-    people = full_dic.keys()
+    people = list(full_dic.keys())
 
     ref_cities_dic = eo.location_list(locations)
 
@@ -40,9 +40,12 @@ def build_x_and_y(path):
     city_list = []
     sentence = []
     scholar = []
+    counter_in_orte = 0
+    counter_in_both = 0
 
-    for k in people:
-    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    # for k in people:
+    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    # for k in [people[0]]:
         full_dic[k]['extracted_orte'] = []
         for c0 in set(ref_cities_clean):
             is_a_city_match, add_sentence = cbm.city_match_sentence(full_dic[k]['leben'], c0)
@@ -69,14 +72,12 @@ def build_x_and_y(path):
                 full_dic[k]['all_orte'] += list(full_dic[k]['clean_orte'][l])
             else:
                 full_dic[k]['all_orte'].append(full_dic[k]['clean_orte'][l])
-        counter_in_orte = 0
-        counter_in_both = 0
         for m in set(full_dic[k]['all_orte']):
             counter_in_orte += 1
             if m in full_dic[k]['extracted_orte']:
                 counter_in_both += 1
 
-    print('Share of matched cities', counter_in_both/counter_in_orte)
+    print('Share of matched cities', counter_in_both, counter_in_orte, counter_in_both/counter_in_orte)
 
     is_a_living_city = np.transpose(np.mat(is_a_living_city))
 

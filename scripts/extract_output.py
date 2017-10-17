@@ -69,6 +69,10 @@ def clean_city(string):
     string9 = re.sub('\)', '', string8)
     string10 = re.sub('\?', '', string9)
 
+#    if re.search('Berlin', string10):
+#        string11 = 'Berlin'
+
+#    if
     return string10
 
 
@@ -76,7 +80,7 @@ def orte_into_people_dic(matrix, dic1):
     dic2 = dic1
     i = 0
     while i < len(matrix):
-        if matrix['idn'][i] != '':
+        if matrix['idn'][i] != '' and not pd.isnull(matrix['idn'][i]):
             try:
                 if re.search('wirk', matrix['funct'][i]):
                     if 'orte' not in dic2[matrix['idn'][i]].keys():
@@ -148,7 +152,7 @@ def clean_city_list(city_list):
     for i in range(len(city_list)):
         cleaned_city_list.append(clean_city(city_list[i]))
 
-    return cleaned_city_list
+    return set(cleaned_city_list)
 
 
 def are_clean_cities_in_bios(dic, key):

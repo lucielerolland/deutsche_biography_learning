@@ -1,0 +1,6 @@
+{
+  "test_log_regression.py::test_sigmoid_vector[1-100]": true,
+  "test_log_regression.py::test_sigmoid_vector[1-101]": true,
+  "test_log_regression.py::test_sigmoid_vector[10]": true,
+  "test_log_regression.py::test_sigmoid_vector[1]": true
+}
