@@ -155,6 +155,23 @@ def clean_city_list(city_list):
     return set(cleaned_city_list)
 
 
+def location_list_clean(source, locations):
+    if source == 'db':
+        ref_cities_dic = location_list(locations)
+        ref_cities_unclean = ref_cities_dic.keys()
+        ref_cities_clean = []
+        for k in ref_cities_unclean:
+            clean = clean_city(k)
+            if clean not in ref_cities_clean:
+                ref_cities_clean.append(clean)
+
+    if source == 'sb':
+        sb_raw = pd.read_csv('../data/staedtebuch_city_locations.csv', encoding='latin1')
+        sb_list = set(sb_raw['markettown'])
+
+        return sb_list
+
+
 def are_clean_cities_in_bios(dic, key):
     dummies = []
     for l in dic[key]['orte'].values():

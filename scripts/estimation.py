@@ -1,4 +1,3 @@
-
 import extract_output as eo
 import extract_input as ei
 import city_bio_matching as cbm
@@ -23,16 +22,11 @@ def build_x_and_y(path):
 
     people = list(full_dic.keys())
 
-    ref_cities_dic = eo.location_list(locations)
+    source = 'sb'
 
-    ref_cities_unclean = ref_cities_dic.keys()
+    ref_cities_clean = eo.location_list_clean(source, locations)
 
-    ref_cities_clean = []
-
-    for k in ref_cities_unclean:
-        clean = eo.clean_city(k)
-        if clean not in ref_cities_clean:
-            ref_cities_clean.append(clean)
+    print('Number of unique locations', len(set(ref_cities_clean)))
 
     # Build y
 
@@ -43,8 +37,8 @@ def build_x_and_y(path):
     counter_in_orte = 0
     counter_in_both = 0
 
-    # for k in people:
-    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    for k in people:
+    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
     # for k in [people[0]]:
         full_dic[k]['extracted_orte'] = []
         for c0 in set(ref_cities_clean):
