@@ -1,4 +1,5 @@
 import numpy as np
+import pandas as pd
 
 
 def sigmoid(z):
@@ -43,6 +44,10 @@ def cost(x, beta, y, l, activation, has_constant=True):
         reg = np.sum(reg)
         full_cost = (1 / m) * (direct_cost_vect + reg)
 
+#    if pd.isnull(full_cost):
+#        for i in range(y.shape[0]):
+#            print(y_hat[i], y[i])
+
     return full_cost
 
 
@@ -71,9 +76,14 @@ def gradient_descent(alpha, x, beta, y, l, activation, has_constant=True):
     return beta_update
 
 
-def pred(x, beta):
-    z = softmax(x.dot(beta))
-    pred_y = z.argmax(axis=1)
+def pred(x, beta, activation):
+    if activation == 'softmax':
+        z = softmax(x.dot(beta))
+        pred_y = z.argmax(axis=1)
+
+    elif activation == 'sigmoid':
+        z = sigmoid(x.dot(beta))
+        pred_y = (z > 0.5)
 
     return pred_y
 

@@ -188,15 +188,17 @@ for l in l_list:
                 beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, activation='sigmoid', has_constant=True)
                 cost.append(lr.cost(train_x, beta, train_y, l, 'sigmoid'))
 
-                if i % (iterations/5) == 0:
+                if i % (iterations/10) == 0:
 #                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
                     print(lr.cost(train_x, beta, train_y, l, 'sigmoid'))
 #                    print(lr.gradient_checker(x=x, y=y, beta=beta, epsilon=epsilon, l=l_list[0], has_constant=True))
 
             # Compute perf on test
 
-            pred_y_train = lr.pred(train_x, beta)
-            pred_y_test = lr.pred(test_x, beta)
+#            pred_y_train = lr.pred(train_x, beta, 'softmax')
+#            pred_y_test = lr.pred(test_x, beta, 'softmax')
+            pred_y_train = lr.pred(train_x, beta, 'sigmoid')
+            pred_y_test = lr.pred(test_x, beta, 'sigmoid')
 
             exact_pred_train = 0
             exact_pred_test = 0
