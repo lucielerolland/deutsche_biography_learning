@@ -10,7 +10,7 @@ from sklearn.feature_extraction.text import CountVectorizer
 # Import input & output
 
 
-def build_x_and_y(path):
+def build_x_and_y(path, source, activation):
 
     biographies = ei.bio_orte_input(path)
 
@@ -21,8 +21,6 @@ def build_x_and_y(path):
     full_dic = eo.orte_into_people_dic(locations, dic1=dic_input)
 
     people = list(full_dic.keys())
-
-    source = 'sb'
 
     ref_cities_clean = eo.location_list_clean(source, locations)
 
@@ -37,8 +35,8 @@ def build_x_and_y(path):
     counter_in_orte = 0
     counter_in_both = 0
 
-    for k in people:
-    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    # for k in people:
+    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
     # for k in [people[0]]:
         full_dic[k]['extracted_orte'] = []
         for c0 in set(ref_cities_clean):
@@ -47,19 +45,27 @@ def build_x_and_y(path):
                 city_list.append(c0)
                 full_dic[k]['extracted_orte'].append(c0)
                 scholar.append(k)
-                if ('tod' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['tod']) or \
-                        ('grab' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['grab']):
-                    is_a_living_city.append(3)
-                    sentence.append(add_sentence)
-                elif 'geburt' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['geburt']:
-                    sentence.append(add_sentence)
-                    is_a_living_city.append(2)
-                elif 'wirk' in full_dic[k]['clean_orte'].keys() and c0 in full_dic[k]['orte']['wirk']:
-                    sentence.append(add_sentence)
-                    is_a_living_city.append(1)
-                else:
-                    sentence.append(add_sentence)
-                    is_a_living_city.append(0)
+                if activation == 'softmax':
+                    if ('tod' in full_dic[k]['orte'].keys() and c0 == full_dic[k]['orte']['tod']) or \
+                            ('grab' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['grab']):
+                        is_a_living_city.append(3)
+                        sentence.append(add_sentence)
+                    elif 'geburt' in full_dic[k]['clean_orte'].keys() and c0 == full_dic[k]['clean_orte']['geburt']:
+                        sentence.append(add_sentence)
+                        is_a_living_city.append(2)
+                    elif 'wirk' in full_dic[k]['clean_orte'].keys() and c0 in full_dic[k]['clean_orte']['wirk']:
+                        sentence.append(add_sentence)
+                        is_a_living_city.append(1)
+                    else:
+                        sentence.append(add_sentence)
+                        is_a_living_city.append(0)
+                if activation == 'sigmoid':
+                    if c0 in list(full_dic[k]['clean_orte'].values()):
+                        is_a_living_city.append(1)
+                        sentence.append(add_sentence)
+                    else:
+                        sentence.append(add_sentence)
+                        is_a_living_city.append(0)
         full_dic[k]['all_orte'] = []
         for l in list(full_dic[k]['clean_orte'].keys()):
             if isinstance(full_dic[k]['clean_orte'][l], list):
@@ -134,7 +140,7 @@ rebuild = True
 
 if rebuild:
     print("Starting building at time : " + str(datetime.now()))
-    x, y = build_x_and_y('../data/')
+    x, y = build_x_and_y('../data/', source='db', activation='sigmoid')
     np.save('x.npy', x)
     np.save('y.npy', y)
 else:
@@ -159,13 +165,11 @@ epsilon = 1e-7
 iterations_list = [1000]
 # iterations_list = [100, 300, 1000, 3000, 10000, 30000, 100000]
 
-alpha_list = [0.3]
+alpha_list = [0.1]
 # alpha_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
 
 l_list = [0.001]
 # l_list = [0.00001, 0.00003, 0.0001, 0.0003, 0.001, 0.003, 0.01, 0.03, 0.1, 0.3, 1, 3, 10, 30, 100, 300, 1000]
-
-# beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
 
 cost = []
 index = []
@@ -176,13 +180,17 @@ print("Starting training at time : " + str(datetime.now()))
 for l in l_list:
     for alpha in alpha_list:
         for iterations in iterations_list:
-            beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
+#            beta = np.mat(np.random.randn(x.shape[1], y_dummies.shape[1]))*0.01
+            beta = np.mat(np.random.randn(x.shape[1], y.shape[1])) * 0.01
             for i in range(iterations):
-                beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, activation='softmax', has_constant=True)
-                cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+#                beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y_dummies, l=l, activation='softmax', has_constant=True)
+#                cost.append(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+                beta = lr.gradient_descent(alpha=alpha, x=train_x, beta=beta, y=train_y, l=l, activation='sigmoid', has_constant=True)
+                cost.append(lr.cost(train_x, beta, train_y, l, 'sigmoid'))
 
                 if i % (iterations/5) == 0:
-                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+#                    print(lr.cost(train_x, beta, train_y_dummies, l, 'softmax'))
+                    print(lr.cost(train_x, beta, train_y, l, 'sigmoid'))
 #                    print(lr.gradient_checker(x=x, y=y, beta=beta, epsilon=epsilon, l=l_list[0], has_constant=True))
 
             # Compute perf on test

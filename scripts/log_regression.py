@@ -30,7 +30,7 @@ def cost(x, beta, y, l, activation, has_constant=True):
     if activation == 'sigmoid':
         y_hat = sigmoid(x.dot(beta))
         direct_cost_vect = -np.multiply(y, np.log(y_hat)) - np.multiply((1-y), np.log(1-y_hat))
-        reg = (l/(2*m))*np.square(beta)
+        reg = (l/(2*m))*np.dot(beta.T, beta)
         full_cost = 1/m*np.sum(direct_cost_vect) + reg
 
     elif activation == 'softmax':
@@ -90,7 +90,7 @@ def grad_vec_to_mat(vector, shape):
     return matrix
 
 
-def gradient_checker(x, y, beta, epsilon, l, has_constant=True):
+def gradient_checker(x, y, beta, epsilon, l, activation, has_constant=True):
 
     beta_shape = (beta.shape[0], beta.shape[1])
 #    beta_name = np.zeros(beta_shape)
