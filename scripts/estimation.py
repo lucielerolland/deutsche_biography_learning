@@ -35,8 +35,8 @@ def build_x_and_y(path, source, activation):
     counter_in_orte = 0
     counter_in_both = 0
 
-    # for k in people:
-    for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
+    for k in people:
+    # for k in ['136810942', '139526781', '129102687', '138361193', '116119160', '119108445', '118925563']:
     # for k in [people[0]]:
         full_dic[k]['extracted_orte'] = []
         for c0 in set(ref_cities_clean):
