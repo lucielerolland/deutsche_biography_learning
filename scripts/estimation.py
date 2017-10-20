@@ -69,7 +69,6 @@ def build_x_and_y(path, subset, source, activation):
                         is_a_living_city.append(1)
                         sentence.append(add_sentence)
                     else:
-                        print(c0, full_dic[k]['all_orte'])
                         sentence.append(add_sentence)
                         is_a_living_city.append(0)
         for m in set(full_dic[k]['all_orte']):
