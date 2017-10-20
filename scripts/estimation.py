@@ -202,7 +202,7 @@ def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_lis
                       ', score test : ' + str(exact_pred_test/total_test))
 
                 lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn,
-                                        extracted_cities=cities, true_cities=city_dic, path=path)
+                                        extracted_cities=cities, is_a_living_city=y, true_cities_full=city_dic, path=path)
 
 
 def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset):

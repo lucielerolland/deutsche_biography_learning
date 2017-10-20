@@ -131,7 +131,7 @@ def gradient_checker(x, y, beta, epsilon, l, activation, has_constant=True):
     return 'Diff:' + str(diff_size)
 
 
-def build_city_list_pred(features, theta, activation, scholars, extracted_cities, true_cities, path):
+def build_city_list_pred(features, theta, activation, scholars, extracted_cities, is_a_living_city, true_cities_full, path):
     pred_y_full = pred(features, theta, activation)
 
     city_list_pred = {}
@@ -140,24 +140,28 @@ def build_city_list_pred(features, theta, activation, scholars, extracted_cities
         if scholars[i] == 0 or (scholars[i] != 0 and scholars[i] != scholars[i-1]):
             city_list_pred[scholars[i]] = {}
             city_list_pred[scholars[i]]['rejected'] = []
-            city_list_pred[scholars[i]]['lived'] = []
+            city_list_pred[scholars[i]]['lived_pred'] = []
+            city_list_pred[scholars[i]]['lived_y'] = []
             if activation == 'softmax':
                 city_list_pred[scholars[i]]['geburt'] = []
                 city_list_pred[scholars[i]]['tod'] = []
         if pred_y_full[i] == 0:
             city_list_pred[scholars[i]]['rejected'].append(extracted_cities[i])
         elif pred_y_full[i] == 1:
-            city_list_pred[scholars[i]]['lived'].append(extracted_cities[i])
+            city_list_pred[scholars[i]]['lived_pred'].append(extracted_cities[i])
         elif pred_y_full[i] == 2 and activation == 'softmax':
             city_list_pred[scholars[i]]['geburt'].append(extracted_cities[i])
         elif pred_y_full[i] == 3 and activation == 'softmax':
             city_list_pred[scholars[i]]['tod'].append(extracted_cities[i])
+        if is_a_living_city[i] == 1:
+            city_list_pred[scholars[i]]['lived_y'].append(extracted_cities[i])
 
     idn_df = []
-    lived_df = []
+    lived_pred_df = []
+    lived_y_df = []
     rejected_df = []
     true_lived_df = []
-    column_names = ['idn', 'rejected', 'lived', 'true_lived']
+    column_names = ['idn', 'rejected', 'lived_pred', 'lived_y', 'true_lived']
     if activation == 'softmax':
         geburt_df = []
         tod_df = []
@@ -167,14 +171,16 @@ def build_city_list_pred(features, theta, activation, scholars, extracted_cities
     for k in set(scholars):
         idn_df.append(k)
         rejected_df.append(city_list_pred[k]['rejected'])
-        lived_df.append(city_list_pred[k]['lived'])
+        lived_pred_df.append(city_list_pred[k]['lived_pred'])
+        lived_y_df.append(city_list_pred[k]['lived_y'])
         if activation == 'sigmoid':
-            true_lived_df.append(true_cities[k])
+            true_lived_df.append(true_cities_full[k])
         if activation == 'softmax':
             geburt_df.append(city_list_pred[k]['geburt'])
             tod_df.append(city_list_pred[k]['tod'])
 
-    full_df = {'idn': idn_df, 'lived': lived_df, 'true_lived': true_lived_df, 'rejected': rejected_df}
+    full_df = {'idn': idn_df, 'lived_pred': lived_pred_df, 'lived_y': lived_y_df, 'true_lived': true_lived_df,
+               'rejected': rejected_df}
     if activation == 'softmax':
         full_df['geburt'] = geburt_df
         full_df['tod'] = tod_df
