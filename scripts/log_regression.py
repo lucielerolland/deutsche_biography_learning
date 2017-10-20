@@ -131,7 +131,7 @@ def gradient_checker(x, y, beta, epsilon, l, activation, has_constant=True):
     return 'Diff:' + str(diff_size)
 
 
-def build_city_list_pred(features, theta, activation, scholars, extracted_cities):
+def build_city_list_pred(features, theta, activation, scholars, extracted_cities, true_cities, path):
     pred_y_full = pred(features, theta, activation)
 
     city_list_pred = {}
@@ -156,7 +156,8 @@ def build_city_list_pred(features, theta, activation, scholars, extracted_cities
     idn_df = []
     lived_df = []
     rejected_df = []
-    column_names = ['idn', 'rejected', 'lived']
+    true_lived_df = []
+    column_names = ['idn', 'rejected', 'lived', 'true_lived']
     if activation == 'softmax':
         geburt_df = []
         tod_df = []
@@ -167,13 +168,15 @@ def build_city_list_pred(features, theta, activation, scholars, extracted_cities
         idn_df.append(k)
         rejected_df.append(city_list_pred[k]['rejected'])
         lived_df.append(city_list_pred[k]['lived'])
+        if activation == 'sigmoid':
+            true_lived_df.append(true_cities[k])
         if activation == 'softmax':
             geburt_df.append(city_list_pred[k]['geburt'])
             tod_df.append(city_list_pred[k]['tod'])
 
-    full_df = {'idn': idn_df, 'lived': lived_df, 'rejected': rejected_df}
+    full_df = {'idn': idn_df, 'lived': lived_df, 'true_lived': true_lived_df, 'rejected': rejected_df}
     if activation == 'softmax':
         full_df['geburt'] = geburt_df
         full_df['tod'] = tod_df
 
-    pd.DataFrame(full_df).to_csv('city_list_pred_sigmoid.csv', encoding='utf-8', index=False, columns=column_names)
+    pd.DataFrame(full_df).to_csv(path + '/final/city_list_pred_' + activation + '.csv', encoding='utf-8', index=False, columns=column_names)

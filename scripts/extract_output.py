@@ -4,11 +4,11 @@ import re
 
 def full_output(dir_prefix):
 
-    output = pd.read_csv(dir_prefix + 'output/output'+str(0)+'.csv')
+    output = pd.read_csv(dir_prefix + '/raw/output/output'+str(0)+'.csv')
 
     i = 1
     while i < 148:
-        read = pd.read_csv(dir_prefix + 'output/output'+str(i)+'.csv')
+        read = pd.read_csv(dir_prefix + '/raw/output/output'+str(i)+'.csv')
         output = output.append(read, ignore_index=True)
         i = i+1
 
@@ -16,12 +16,12 @@ def full_output(dir_prefix):
 
 
 def orte_output(dir_prefix):
-    output = pd.read_csv(dir_prefix + 'output/output'+str(0)+'.csv')
+    output = pd.read_csv(dir_prefix + '/raw/output/output'+str(0)+'.csv')
     output = output[output.iplace == 1]
 
     i = 1
     while i < 148:
-        read = pd.read_csv(dir_prefix + 'output/output'+str(i)+'.csv')
+        read = pd.read_csv(dir_prefix + '/raw/output/output'+str(i)+'.csv')
         read = read[read.iplace == 1]
         output = output.append(read, ignore_index=True)
         i = i+1
@@ -30,12 +30,12 @@ def orte_output(dir_prefix):
 
 
 def orte_no_bio_output(dir_prefix):
-    output = pd.read_csv(dir_prefix + 'output/output'+str(0)+'.csv')
+    output = pd.read_csv(dir_prefix + '/raw/output/output'+str(0)+'.csv')
     output = output[(output.iplace == 1) & (output.ibio == 0)]
 
     i = 1
     while i < 148:
-        read = pd.read_csv(dir_prefix + 'output/output'+str(i)+'.csv')
+        read = pd.read_csv(dir_prefix + '/raw/output/output'+str(i)+'.csv')
         read = read[(read.iplace == 1) & (read.ibio == 0)]
         output = output.append(read, ignore_index=True)
         i = i+1
@@ -44,12 +44,12 @@ def orte_no_bio_output(dir_prefix):
 
 
 def orte_bio_output(dir_prefix):
-    output = pd.read_csv(dir_prefix + 'output/output'+str(0)+'.csv')
+    output = pd.read_csv(dir_prefix + '/raw/output/output'+str(0)+'.csv')
     output = output[(output.iplace == 1) & (output.ibio == 1)]
 
     i = 1
     while i < 148:
-        read = pd.read_csv(dir_prefix + 'output/output'+str(i)+'.csv')
+        read = pd.read_csv(dir_prefix + '/raw/output/output'+str(i)+'.csv')
         read = read[(read.iplace == 1) & (read.ibio == 1)]
         output = output.append(read, ignore_index=True)
         i = i+1
@@ -155,7 +155,7 @@ def clean_city_list(city_list):
     return set(cleaned_city_list)
 
 
-def location_list_clean(source, locations):
+def location_list_clean(source, locations, path):
     if source == 'db':
         ref_cities_dic = location_list(locations)
         ref_cities_unclean = ref_cities_dic.keys()
@@ -166,7 +166,7 @@ def location_list_clean(source, locations):
                 city_list.append(clean)
 
     if source == 'sb':
-        sb_raw = pd.read_csv('../data/staedtebuch_city_locations.csv', encoding='latin1')
+        sb_raw = pd.read_csv(path + '/staedtebuch_city_locations.csv', encoding='latin1')
         city_list = set(sb_raw['markettown'])
 
     return city_list

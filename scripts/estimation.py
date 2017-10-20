@@ -6,6 +6,7 @@ import numpy as np
 import random
 from datetime import datetime
 from sklearn.feature_extraction.text import CountVectorizer
+import pandas as pd
 
 
 def build_x_and_y(path, subset, source, activation):
@@ -20,7 +21,7 @@ def build_x_and_y(path, subset, source, activation):
 
     people = list(full_dic.keys())
 
-    ref_cities_clean = eo.location_list_clean(source, locations)
+    ref_cities_clean = eo.location_list_clean(source, locations, path)
 
     print('Number of unique locations', len(set(ref_cities_clean)))
 
@@ -30,6 +31,9 @@ def build_x_and_y(path, subset, source, activation):
     city_list = []
     sentence = []
     scholar = []
+
+    true_orte_dic = {}
+
     counter_in_orte = 0
     counter_in_both = 0
 
@@ -77,6 +81,10 @@ def build_x_and_y(path, subset, source, activation):
             counter_in_orte += 1
             if m in full_dic[k]['extracted_orte']:
                 counter_in_both += 1
+        if activation == 'sigmoid':
+            true_orte_dic[k] = full_dic[k]['all_orte']
+        if activation == 'softmax':
+            true_orte_dic[k] = full_dic[k]['clean_orte']
 
     print('Share of matched cities', counter_in_both, counter_in_orte, counter_in_both/counter_in_orte)
 
@@ -100,7 +108,7 @@ def build_x_and_y(path, subset, source, activation):
 
     features = np.concatenate((intercept, features_no_intercept_cr), axis=1)
 
-    return features, is_a_living_city, scholar, city_list
+    return features, is_a_living_city, scholar, city_list, true_orte_dic
 
 # Separate train & test
 
@@ -137,24 +145,24 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies, activat
 def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset):
 
     if rebuild:
-        print("Starting building at time : " + str(datetime.now()))
-        x, y, idn, cities = build_x_and_y(path, subset, source=source, activation='sigmoid')
-        np.save('x.npy', x)
-        np.save('y.npy', y)
-        np.save('idn.npy', idn)
-        np.save('cities.npy', cities)
+        print("Started building at time : " + str(datetime.now()))
+        x, y, idn, cities, city_dic = build_x_and_y(path, subset, source=source, activation='sigmoid')
+        np.save(path + '/intermediary/x_sigmoid.npy', x)
+        np.save(path + '/intermediary/y_sigmoid.npy', y)
+        np.save(path + '/intermediary/idn_sigmoid.npy', idn)
+        np.save(path + '/intermediary/cities_sigmoid.npy', cities)
     else:
-        print("Starting loading at time : " + str(datetime.now()))
-        x = np.load('x.npy')
-        y = np.load('y.npy')
-        idn = np.load('idn.npy')
-        cities = np.load('cities.npy')
+        print("Started loading at time : " + str(datetime.now()))
+        x = np.load(path + '/intermediary/x_sigmoid.npy')
+        y = np.load(path + '/intermediary/y_sigmoid.npy')
+        idn = np.load(path + '/intermediary/idn_sigmoid.npy')
+        cities = np.load(path + '/intermediary/cities_sigmoid.npy')
 
     train, test = train_and_test(features=x, is_a_living_city=y, is_a_living_city_dummies=[], activation='sigmoid')
 
     cost = []
 
-    print("Starting training at time : " + str(datetime.now()))
+    print("Started training at time : " + str(datetime.now()))
 
     for l in l_list:
         for alpha in alpha_list:
@@ -193,23 +201,24 @@ def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_lis
                       ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train/total_train) +
                       ', score test : ' + str(exact_pred_test/total_test))
 
-                lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn, extracted_cities=cities)
+                lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn,
+                                        extracted_cities=cities, true_cities=city_dic, path=path)
 
 
 def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset):
     if rebuild:
         print("Starting building at time : " + str(datetime.now()))
-        x, y, idn, cities = build_x_and_y(path, subset, source=source, activation='softmax')
-        np.save('x.npy', x)
-        np.save('y.npy', y)
-        np.save('idn.npy', idn)
-        np.save('cities.npy', cities)
+        x, y, idn, cities, city_dic = build_x_and_y(path, subset, source=source, activation='softmax')
+        np.save(path + '/intermediary/x_softmax.npy', x)
+        np.save(path + '/intermediary/y_softmax.npy', y)
+        np.save(path + '/intermediary/idn_softmax.npy', idn)
+        np.save(path + '/intermediary/cities_softmax.npy', cities)
     else:
         print("Starting loading at time : " + str(datetime.now()))
-        x = np.load('x.npy')
-        y = np.load('y.npy')
-        idn = np.load('idn.npy')
-        cities = np.load('cities.npy')
+        x = np.load(path + '/intermediary/x_softmax.npy')
+        y = np.load(path + '/intermediary/y_softmax.npy')
+        idn = np.load(path + '/intermediary/idn_softmax.npy')
+        cities = np.load(path + '/intermediary/cities_softmax.npy')
 
     K = 4
 
@@ -259,7 +268,7 @@ def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_lis
                       ', score test : ' + str(exact_pred_test / total_test))
 
                 lr.build_city_list_pred(features=x, theta=beta, activation='softmax', scholars=idn,
-                                        extracted_cities=cities)
+                                        extracted_cities=cities, true_cities=city_dic, rebuild=rebuild, path=path)
 
 
 def estimation(activation, path, source, rebuild, alpha_list, iterations_list, l_list, subset):
