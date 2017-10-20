@@ -129,3 +129,51 @@ def gradient_checker(x, y, beta, epsilon, l, activation, has_constant=True):
     diff_size = np.linalg.norm(true_grad-fake_grad)/(np.linalg.norm(true_grad) + np.linalg.norm(fake_grad))
 
     return 'Diff:' + str(diff_size)
+
+
+def build_city_list_pred(features, theta, activation, scholars, extracted_cities):
+    pred_y_full = pred(features, theta, activation)
+
+    city_list_pred = {}
+
+    for i in range(len(scholars)):
+        if scholars[i] == 0 or (scholars[i] != 0 and scholars[i] != scholars[i-1]):
+            city_list_pred[scholars[i]] = {}
+            city_list_pred[scholars[i]]['rejected'] = []
+            city_list_pred[scholars[i]]['lived'] = []
+            if activation == 'softmax':
+                city_list_pred[scholars[i]]['geburt'] = []
+                city_list_pred[scholars[i]]['tod'] = []
+        if pred_y_full[i] == 0:
+            city_list_pred[scholars[i]]['rejected'].append(extracted_cities[i])
+        elif pred_y_full[i] == 1:
+            city_list_pred[scholars[i]]['lived'].append(extracted_cities[i])
+        elif pred_y_full[i] == 2 and activation == 'softmax':
+            city_list_pred[scholars[i]]['geburt'].append(extracted_cities[i])
+        elif pred_y_full[i] == 3 and activation == 'softmax':
+            city_list_pred[scholars[i]]['tod'].append(extracted_cities[i])
+
+    idn_df = []
+    lived_df = []
+    rejected_df = []
+    column_names = ['idn', 'rejected', 'lived']
+    if activation == 'softmax':
+        geburt_df = []
+        tod_df = []
+        column_names.append('geburt')
+        column_names.append('tod')
+
+    for k in set(scholars):
+        idn_df.append(k)
+        rejected_df.append(city_list_pred[k]['rejected'])
+        lived_df.append(city_list_pred[k]['lived'])
+        if activation == 'softmax':
+            geburt_df.append(city_list_pred[k]['geburt'])
+            tod_df.append(city_list_pred[k]['tod'])
+
+    full_df = {'idn': idn_df, 'lived': lived_df, 'rejected': rejected_df}
+    if activation == 'softmax':
+        full_df['geburt'] = geburt_df
+        full_df['tod'] = tod_df
+
+    pd.DataFrame(full_df).to_csv('city_list_pred_sigmoid.csv', encoding='utf-8', index=False, columns=column_names)
