@@ -69,10 +69,18 @@ def clean_city(string):
     string9 = re.sub('\)', '', string8)
     string10 = re.sub('\?', '', string9)
 
-#    if re.search('Berlin', string10):
-#        string11 = 'Berlin'
+    try:
+        if string10[-1] == '.':
+            string10 = string10[:-1]
+    except IndexError:
+        pass
 
-#    if
+    try:
+        if string10[-1] == ' ':
+            string10 = string10[:-1]
+    except IndexError:
+        pass
+
     return string10
 
 
@@ -131,6 +139,20 @@ def orte_into_people_dic(matrix, dic1):
         i = i+1
 
     return dic2
+
+
+def add_all_orte(dic):
+    dic1 = dic
+    for k in dic1.keys():
+        dic1[k]['all_orte'] = []
+        for l in list(dic1[k]['clean_orte'].keys()):
+            if isinstance(dic1[k]['clean_orte'][l], list):
+                dic1[k]['all_orte'] += list(dic1[k]['clean_orte'][l])
+            else:
+                dic1[k]['all_orte'].append(dic1[k]['clean_orte'][l])
+
+    return dic1
+
 
 
 def location_list(matrix):

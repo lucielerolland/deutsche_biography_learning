@@ -17,7 +17,7 @@ def build_x_and_y(path, subset, source, activation):
 
     dic_input = ei.bio_into_people_dic(biographies, dic1={})
 
-    full_dic = eo.orte_into_people_dic(locations, dic1=dic_input)
+    full_dic = eo.add_all_orte(eo.orte_into_people_dic(locations, dic1=dic_input))
 
     people = list(full_dic.keys())
 
@@ -65,18 +65,13 @@ def build_x_and_y(path, subset, source, activation):
                         sentence.append(add_sentence)
                         is_a_living_city.append(0)
                 if activation == 'sigmoid':
-                    if c0 in list(full_dic[k]['clean_orte'].values()):
+                    if c0 in list(full_dic[k]['all_orte']):
                         is_a_living_city.append(1)
                         sentence.append(add_sentence)
                     else:
+                        print(c0, full_dic[k]['all_orte'])
                         sentence.append(add_sentence)
                         is_a_living_city.append(0)
-        full_dic[k]['all_orte'] = []
-        for l in list(full_dic[k]['clean_orte'].keys()):
-            if isinstance(full_dic[k]['clean_orte'][l], list):
-                full_dic[k]['all_orte'] += list(full_dic[k]['clean_orte'][l])
-            else:
-                full_dic[k]['all_orte'].append(full_dic[k]['clean_orte'][l])
         for m in set(full_dic[k]['all_orte']):
             counter_in_orte += 1
             if m in full_dic[k]['extracted_orte']:
