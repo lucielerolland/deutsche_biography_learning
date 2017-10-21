@@ -81,9 +81,6 @@ def clean_city(string):
     except IndexError:
         pass
 
-    if string10 == 'Au':
-        string10 = ''
-
     return string10
 
 
@@ -157,7 +154,6 @@ def add_all_orte(dic):
     return dic1
 
 
-
 def location_list(matrix):
     loc = {}
     i = 0
@@ -187,7 +183,7 @@ def location_list_clean(source, locations, path):
         city_list = []
         for k in ref_cities_unclean:
             clean = clean_city(k)
-            if clean not in city_list:
+            if clean not in city_list and clean != 'Au':
                 city_list.append(clean)
 
     if source == 'sb':
