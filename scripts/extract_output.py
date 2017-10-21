@@ -81,6 +81,9 @@ def clean_city(string):
     except IndexError:
         pass
 
+    if string10 == 'Au':
+        string10 = ''
+
     return string10
 
 
