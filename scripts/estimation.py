@@ -136,7 +136,7 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies, activat
 # Gradient descent
 
 
-def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset):
+def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
 
     if rebuild:
         print("Started building at time : " + str(datetime.now()))
@@ -195,11 +195,12 @@ def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_lis
                       ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train/total_train) +
                       ', score test : ' + str(exact_pred_test/total_test))
 
-                lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn,
+                if output:
+                    lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn,
                                         extracted_cities=cities, is_a_living_city=y, true_cities_full=city_dic, path=path)
 
 
-def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset):
+def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
     if rebuild:
         print("Starting building at time : " + str(datetime.now()))
         x, y, idn, cities, city_dic = build_x_and_y(path, subset, source=source, activation='softmax')
@@ -261,12 +262,13 @@ def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_lis
                       ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train / total_train) +
                       ', score test : ' + str(exact_pred_test / total_test))
 
-                lr.build_city_list_pred(features=x, theta=beta, activation='softmax', scholars=idn,
+                if output:
+                    lr.build_city_list_pred(features=x, theta=beta, activation='softmax', scholars=idn,
                                         extracted_cities=cities, true_cities=city_dic, rebuild=rebuild, path=path)
 
 
-def estimation(activation, path, source, rebuild, alpha_list, iterations_list, l_list, subset):
+def estimation(activation, path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
     if activation == 'softmax':
-        estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset)
+        estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output)
     elif activation == 'sigmoid':
-        estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset)
+        estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output)
