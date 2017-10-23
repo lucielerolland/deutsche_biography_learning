@@ -6,7 +6,6 @@ import numpy as np
 import random
 from datetime import datetime
 from sklearn.feature_extraction.text import CountVectorizer
-import pandas as pd
 
 
 def build_x_and_y(path, subset, source, activation):
@@ -18,6 +17,8 @@ def build_x_and_y(path, subset, source, activation):
     dic_input = ei.bio_into_people_dic(biographies, dic1={})
 
     full_dic = eo.add_all_orte(eo.orte_into_people_dic(locations, dic1=dic_input))
+
+    eo.save_true_scholar_city_dic(full_dic, activation, path)
 
     people = list(full_dic.keys())
 
@@ -102,7 +103,7 @@ def build_x_and_y(path, subset, source, activation):
 
     features = np.concatenate((intercept, features_no_intercept_cr), axis=1)
 
-    return features, is_a_living_city, scholar, city_list, true_orte_dic
+    return features, is_a_living_city, scholar, city_list
 
 # Separate train & test
 
@@ -140,7 +141,7 @@ def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_lis
 
     if rebuild:
         print("Started building at time : " + str(datetime.now()))
-        x, y, idn, cities, city_dic = build_x_and_y(path, subset, source=source, activation='sigmoid')
+        x, y, idn, cities = build_x_and_y(path, subset, source=source, activation='sigmoid')
         np.save(path + '/intermediary/x_sigmoid.npy', x)
         np.save(path + '/intermediary/y_sigmoid.npy', y)
         np.save(path + '/intermediary/idn_sigmoid.npy', idn)
@@ -175,35 +176,25 @@ def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_lis
                 pred_y_train = lr.pred(train['x'], beta, 'sigmoid')
                 pred_y_test = lr.pred(test['x'], beta, 'sigmoid')
 
-                exact_pred_train = 0
-                exact_pred_test = 0
-
-                total_train = 0
-                total_test = 0
-
-                for i in range(np.shape(pred_y_train)[0]):
-                    total_train += 1
-                    if pred_y_train[i] == train['y'][i]:
-                        exact_pred_train += 1
-
-                for i in range(np.shape(pred_y_test)[0]):
-                    total_test += 1
-                    if pred_y_test[i] == test['y'][i]:
-                        exact_pred_test += 1
+                accuracy_train, _, _, _ = lr.performance_metrics_logistic(pred_y_train, train['y'])
+                accuracy_test, precision_test, recall_test, f1_test = lr.performance_metrics_logistic(pred_y_test, test['y'])
 
                 print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', alpha : ' + str(alpha) +
-                      ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train/total_train) +
-                      ', score test : ' + str(exact_pred_test/total_test))
+                      ', iter : ' + str(iterations) + ', score train : ' + str(accuracy_train) +
+                      ', score test : ' + str(accuracy_test))
+
+                print('Test precision : ', precision_test, ', test recall : ',
+                      recall_test, ', test f1 : ', f1_test)
 
                 if output:
                     lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn,
-                                        extracted_cities=cities, is_a_living_city=y, true_cities_full=city_dic, path=path)
+                                            extracted_cities=cities, is_a_living_city=y, path=path)
 
 
 def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
     if rebuild:
         print("Starting building at time : " + str(datetime.now()))
-        x, y, idn, cities, city_dic = build_x_and_y(path, subset, source=source, activation='softmax')
+        x, y, idn, cities = build_x_and_y(path, subset, source=source, activation='softmax')
         np.save(path + '/intermediary/x_softmax.npy', x)
         np.save(path + '/intermediary/y_softmax.npy', y)
         np.save(path + '/intermediary/idn_softmax.npy', idn)
@@ -242,29 +233,22 @@ def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_lis
                 pred_y_train = lr.pred(train['x'], beta, 'softmax')
                 pred_y_test = lr.pred(test['x'], beta, 'softmax')
 
-                exact_pred_train = 0
-                exact_pred_test = 0
-
-                total_train = 0
-                total_test = 0
-
-                for i in range(np.shape(pred_y_train)[0]):
-                    total_train += 1
-                    if pred_y_train[i] == train['y'][i]:
-                        exact_pred_train += 1
-
-                for i in range(np.shape(pred_y_test)[0]):
-                    total_test += 1
-                    if pred_y_test[i] == test['y'][i]:
-                        exact_pred_test += 1
+                accuracy_train, _, _, _ = lr.performance_metrics_softmax(pred_y_train, train['y'], K)
+                accuracy_test, precision_test, recall_test, f1_test = lr.performance_metrics_softmax(pred_y_test, test['y'], K)
 
                 print('At time : ' + str(datetime.now()) + ', l : ' + str(l) + ', alpha : ' + str(alpha) +
-                      ', iter : ' + str(iterations) + ', score train : ' + str(exact_pred_train / total_train) +
-                      ', score test : ' + str(exact_pred_test / total_test))
+                      ', iter : ' + str(iterations) + ', score train : ' + str(accuracy_train) +
+                      ', score test : ' + str(accuracy_test))
+                for k in range(K):
+                    if k == 0:
+                        pass
+                    else:
+                        print('For class ', k, ', test precision : ', precision_test[k], ', test recall : ',
+                              recall_test[k], ', test f1 : ', f1_test[k])
 
                 if output:
                     lr.build_city_list_pred(features=x, theta=beta, activation='softmax', scholars=idn,
-                                        extracted_cities=cities, true_cities=city_dic, rebuild=rebuild, path=path)
+                                            extracted_cities=cities, path=path, is_a_living_city=y)
 
 
 def estimation(activation, path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):

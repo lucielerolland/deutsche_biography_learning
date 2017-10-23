@@ -1,5 +1,6 @@
 import numpy as np
 import pandas as pd
+import extract_output as eo
 
 
 def sigmoid(z):
@@ -131,7 +132,7 @@ def gradient_checker(x, y, beta, epsilon, l, activation, has_constant=True):
     return 'Diff:' + str(diff_size)
 
 
-def build_city_list_pred(features, theta, activation, scholars, extracted_cities, is_a_living_city, true_cities_full, path):
+def build_city_list_pred(features, theta, activation, scholars, extracted_cities, is_a_living_city, path):
     pred_y_full = pred(features, theta, activation)
 
     city_list_pred = {}
@@ -160,29 +161,114 @@ def build_city_list_pred(features, theta, activation, scholars, extracted_cities
     lived_pred_df = []
     lived_y_df = []
     rejected_df = []
-    true_lived_df = []
-    column_names = ['idn', 'rejected', 'lived_pred', 'lived_y', 'true_lived']
+    column_names = ['idn', 'rejected', 'lived_pred', 'true_lived']
+    if activation == 'sigmoid':
+        column_names.append('lived_y')
     if activation == 'softmax':
         geburt_df = []
         tod_df = []
         column_names.append('geburt')
         column_names.append('tod')
+        column_names.append('true_geburt')
+        column_names.append('true_tod')
 
     for k in set(scholars):
         idn_df.append(k)
         rejected_df.append(city_list_pred[k]['rejected'])
         lived_pred_df.append(city_list_pred[k]['lived_pred'])
         lived_y_df.append(city_list_pred[k]['lived_y'])
-        if activation == 'sigmoid':
-            true_lived_df.append(true_cities_full[k])
         if activation == 'softmax':
             geburt_df.append(city_list_pred[k]['geburt'])
             tod_df.append(city_list_pred[k]['tod'])
 
-    full_df = {'idn': idn_df, 'lived_pred': lived_pred_df, 'lived_y': lived_y_df, 'true_lived': true_lived_df,
-               'rejected': rejected_df}
+    full_pred_df = {'idn': idn_df, 'lived_pred': lived_pred_df,
+                    'rejected': rejected_df}
+    if activation == 'sigmoid':
+        full_pred_df['lived_y'] = lived_y_df
     if activation == 'softmax':
-        full_df['geburt'] = geburt_df
-        full_df['tod'] = tod_df
+        full_pred_df['geburt'] = geburt_df
+        full_pred_df['tod'] = tod_df
 
-    pd.DataFrame(full_df).to_csv(path + '/final/city_list_pred_' + activation + '.csv', encoding='utf-8', index=False, columns=column_names)
+    full_pred = pd.DataFrame(full_pred_df)
+
+    true = eo.load_true_scholar_city_dic(activation, path)
+
+    full_df = pd.merge(full_pred, true, on='idn')
+
+    full_df.to_csv(path + '/final/city_list_pred_' + activation + '.csv', encoding='utf-8', index=False, columns=column_names)
+
+
+def performance_metrics_logistic(true, pred):
+    total = 0
+    pos_true = 0
+    neg_true = 0
+    pos_false = 0
+    neg_false = 0
+    epsilon = 10e-7  # for numerical stability
+
+    assert len(true) == len(pred)
+
+    for i in range(len(true)):
+        total += 1
+        if pred[i] == 1:
+            if true[i] == 1:
+                pos_true += 1
+            elif true[i] == 0:
+                pos_false += 1
+        elif pred[i] == 0:
+            if true[i] == 1:
+                neg_false += 1
+            elif true[i] == 0:
+                neg_true += 1
+
+        accuracy = (pos_true+neg_true)/total
+        precision = pos_true/(pos_true+pos_false + epsilon)
+        recall = pos_true/(pos_true+neg_false + epsilon)
+        f1 = 1*precision*recall/(precision+recall + epsilon)
+
+    return accuracy, precision, recall, f1
+
+
+def performance_metrics_softmax(true, pred, nclass):
+    total = 0
+    right_class = 0
+    step = 1/nclass  # Size of increment knowing we'll be in a double loop on nclass and vector size
+    pos_true = {}
+    neg_true = {}
+    pos_false = {}
+    neg_false = {}
+    precision = {}
+    recall = {}
+    f1 = {}
+    epsilon = 10e-7 # for numerical stability
+
+    assert len(true) == len(pred)
+
+    for k in range(nclass):
+        pos_true[k] = 0
+        neg_true[k] = 0
+        pos_false[k] = 0
+        neg_false[k] = 0
+        for i in range(len(true)):
+            total += step
+            if pred[i] == k:
+                if true[i] == pred[i]:
+                    pos_true[k] += 1
+                    right_class += step
+                elif true[i] != pred[i]:
+                    pos_false[k] += 1
+            elif pred[i] != k:
+                if true[i] == pred[i]:
+                    neg_true[k] += 1
+                    right_class += step
+                elif true[i] != pred[i]:
+                    neg_false[k] += 1
+        precision[k] = pos_true[k]/(pos_true[k] + pos_false[k] + epsilon)
+        recall[k] = pos_true[k]/(pos_true[k] + neg_false[k] + epsilon)
+        f1[k] = 2*precision[k]*recall[k]/(precision[k] + recall[k] + epsilon)
+
+    accuracy = right_class/total
+
+    return accuracy, precision, recall, f1
+
+

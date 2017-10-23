@@ -150,6 +150,7 @@ def add_all_orte(dic):
                 dic1[k]['all_orte'] += list(dic1[k]['clean_orte'][l])
             else:
                 dic1[k]['all_orte'].append(dic1[k]['clean_orte'][l])
+        dic1[k]['all_orte'] = set(dic1[k]['all_orte'])
 
     return dic1
 
@@ -203,3 +204,57 @@ def are_clean_cities_in_bios(dic, key):
             dummies.append(0)
 
     return dummies
+
+
+def save_true_scholar_city_dic(dic, activation, path):
+
+    save_path = path + '/intermediary/'
+
+    if activation == 'sigmoid':
+        scholars = []
+        cities = []
+        for k in dic.keys():
+            scholars.append(k)
+            if 'all_orte' in dic[k].keys():
+                cities.append(dic[k]['all_orte'])
+            else:
+                cities.append('')
+
+        pd.DataFrame({'idn': scholars, 'true_lived': cities})\
+            .to_csv(save_path + 'true_scholar_dic_' + activation + '.csv', index=False,
+                    columns=['idn', 'true_lived'], encoding='utf-8')
+    if activation == 'softmax':
+        scholars = []
+        geburt = []
+        wirk = []
+        tod = []
+        for k in dic.keys():
+            scholars.append(k)
+            if 'geburt' in dic[k]['clean_orte'].keys():
+                geburt.append(dic[k]['clean_orte']['geburt'])
+            else:
+                geburt.append('')
+            if 'wirk' in dic[k]['clean_orte'].keys():
+                wirk.append(dic[k]['clean_orte']['wirk'])
+            else:
+                wirk.append('')
+            if not ('tod' in dic[k]['clean_orte'].keys() or 'grab' in dic[k]['clean_orte'].keys()):
+                tod.append('')
+            elif 'tod' in dic[k]['clean_orte'].keys() and 'grab' in dic[k]['clean_orte'].keys():
+                tod.append([dic[k]['clean_orte']['tod'], dic[k]['clean_orte']['grab']])
+            elif 'tod' in dic[k]['clean_orte'].keys():
+                tod.append(dic[k]['clean_orte']['tod'])
+            elif 'grab' in dic[k]['clean_orte'].keys():
+                tod.append(dic[k]['clean_orte']['grab'])
+
+        pd.DataFrame({'idn': scholars, 'true_geburt': geburt, 'true_lived': wirk, 'true_tod': tod}).\
+            to_csv(save_path + 'true_scholar_dic_' + activation + '.csv', index=False,
+                   columns=['idn', 'true_geburt', 'true_lived', 'true_tod'], encoding='utf-8')
+
+
+def load_true_scholar_city_dic(activation, path):
+    load_path = path + '/intermediary/'
+
+    true_scholar_city_dic = pd.read_csv(load_path + 'true_scholar_dic_' + activation + '.csv', encoding='utf-8')
+
+    return true_scholar_city_dic

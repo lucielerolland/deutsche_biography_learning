@@ -4,8 +4,8 @@ data_path = '../data'
 city_source = 'db'
 should_rebuild = True
 should_consider_all = 'full'
-activation = 'softmax'
-build_output = False
+activation = 'sigmoid'
+build_city_pred = True
 
 
 iter_list = [1000]
@@ -19,4 +19,4 @@ lambda_list = [0.001]
 
 es.estimation(activation=activation, path=data_path, source=city_source, rebuild=should_rebuild,
               subset=should_consider_all, iterations_list=iter_list, alpha_list=a_list, l_list=lambda_list,
-              output=build_output)
+              output=build_city_pred)
