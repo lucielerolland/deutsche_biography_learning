@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 import extract_output as eo
+import csv
+import os.path
 
 
 def sigmoid(z):
@@ -274,3 +276,31 @@ def performance_metrics_softmax(true, pred, nclass):
     return accuracy, precision, recall, f1
 
 
+def save_metrics(activation, alpha, iterations, l, path, accuracy_train, accuracy_test, precision, recall, f1, current_cost):
+    header = ['alpha', 'iterations', 'lambda', 'accuracy_train', 'accuracy_test', 'cost']
+    line = [alpha, iterations, l, accuracy_train, accuracy_test, current_cost]
+    if activation == 'sigmoid':
+        header.append('precision_test')
+        line.append(precision)
+        header.append('recall_test')
+        line.append(recall)
+        header.append('f1_test')
+        line.append(f1)
+    elif activation == 'softmax':
+        for k in precision.keys():
+            if k != 0:
+                header.append('precision_test_class_' + str(k))
+                line.append(precision[k])
+                header.append('recall_test_class_' + str(k))
+                line.append(recall[k])
+                header.append('f1_test_class_' + str(k))
+                line.append(f1[k])
+    if os.path.isfile(path + '/final/metrics_' + activation + '.csv'):
+        file_exists = 1
+    else:
+        file_exists = 0
+    with open(path + '/final/metrics_' + activation + '.csv', 'a', encoding='utf-8') as g:
+        writer = csv.writer(g)
+        if file_exists == 0:
+            writer.writerow(header)
+        writer.writerow(line)

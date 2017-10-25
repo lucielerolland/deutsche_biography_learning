@@ -137,7 +137,7 @@ def train_and_test(features, is_a_living_city, is_a_living_city_dummies, activat
 # Gradient descent
 
 
-def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
+def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output_pred, output_metrics):
 
     if rebuild:
         print("Started building at time : " + str(datetime.now()))
@@ -186,12 +186,17 @@ def estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_lis
                 print('Test precision : ', precision_test, ', test recall : ',
                       recall_test, ', test f1 : ', f1_test)
 
-                if output:
+                if output_metrics:
+                    lr.save_metrics(activation='sigmoid', alpha=alpha, iterations=iterations, l=l, path=path,
+                                    accuracy_train=accuracy_train, accuracy_test=accuracy_test, precision=precision_test,
+                                    recall=recall_test, f1=f1_test, current_cost=float(cost[-1]))
+
+                if output_pred:
                     lr.build_city_list_pred(features=x, theta=beta, activation='sigmoid', scholars=idn,
                                             extracted_cities=cities, is_a_living_city=y, path=path)
 
 
-def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
+def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output_pred, output_metrics):
     if rebuild:
         print("Starting building at time : " + str(datetime.now()))
         x, y, idn, cities = build_x_and_y(path, subset, source=source, activation='softmax')
@@ -246,13 +251,18 @@ def estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_lis
                         print('For class ', k, ', test precision : ', precision_test[k], ', test recall : ',
                               recall_test[k], ', test f1 : ', f1_test[k])
 
-                if output:
+                if output_metrics:
+                    lr.save_metrics(activation='softmax', alpha=alpha, iterations=iterations, l=l, path=path,
+                                    accuracy_train=accuracy_train, accuracy_test=accuracy_test, precision=precision_test,
+                                    recall=recall_test, f1=f1_test, current_cost=float(cost[-1]))
+
+                if output_pred:
                     lr.build_city_list_pred(features=x, theta=beta, activation='softmax', scholars=idn,
                                             extracted_cities=cities, path=path, is_a_living_city=y)
 
 
-def estimation(activation, path, source, rebuild, alpha_list, iterations_list, l_list, subset, output):
+def estimation(activation, path, source, rebuild, alpha_list, iterations_list, l_list, subset, output_pred, output_metrics):
     if activation == 'softmax':
-        estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output)
+        estimation_softmax(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output_pred, output_metrics)
     elif activation == 'sigmoid':
-        estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output)
+        estimation_sigmoid(path, source, rebuild, alpha_list, iterations_list, l_list, subset, output_pred, output_metrics)
