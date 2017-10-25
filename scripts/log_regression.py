@@ -28,17 +28,19 @@ def y_to_dummies(vector, K):
 
 def cost(x, beta, y, l, activation, has_constant=True):
 
+    epsilon = 10e-7
+
     m = np.shape(x)[0]
     if activation == 'sigmoid':
         y_hat = sigmoid(x.dot(beta))
-        direct_cost_vect = -np.multiply(y, np.log(y_hat)) - np.multiply((1-y), np.log(1-y_hat))
+        direct_cost_vect = -np.multiply(y, np.log(y_hat + epsilon)) - np.multiply((1-y), np.log(1-y_hat + epsilon))
         reg = (l/(2*m))*np.dot(beta.T, beta)
         full_cost = 1/m*np.sum(direct_cost_vect) + reg
 
     elif activation == 'softmax':
 
         y_hat = softmax(x.dot(beta))
-        direct_cost_vect = np.sum(-np.multiply(y, np.log(y_hat)))
+        direct_cost_vect = np.sum(-np.multiply(y, np.log(y_hat + epsilon)))
         reg = (l / 2) * np.multiply(beta, beta)
         if has_constant:
             reg[:, 0] = 0
